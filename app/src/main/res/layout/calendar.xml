@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:mcv_showOtherDates="true"
+        app:mcv_arrowColor="#61E24C"
+        app:mcv_selectionColor="#61E24C"
+        app:mcv_headerTextAppearance="?android:attr/textAppearanceLarge"
+        app:mcv_dateTextAppearance="?android:attr/textAppearanceSmall"
+        app:mcv_weekDayTextAppearance="?android:attr/textAppearanceMedium"
+        app:mcv_weekDayLabels="@array/days"
+        app:mcv_monthLabels="@array/months"
+        app:mcv_tileSize="40dp"
+        app:mcv_firstDayOfWeek="sunday" />
+
+    <TextView
+        android:id="@+id/sched_details"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="Schedule Details"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+</LinearLayout>
