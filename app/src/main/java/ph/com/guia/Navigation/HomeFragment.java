@@ -29,9 +29,10 @@ public class HomeFragment extends Fragment {
     static AppCompatActivity activity;
     public static RecyclerView rv;
     public static RVadapter adapter;
-    public static ProgressDialog pd;
-
+    public static ProgressDialog pd, pd2;
+    public static LinearLayoutManager llm;
     public static ArrayList<Tours> mList = new ArrayList<Tours>();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +42,6 @@ public class HomeFragment extends Fragment {
         pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, false);
         JSONParser parser = new JSONParser(getActivity().getApplicationContext());
         parser.getAllTours(Constants.getAllTours);
-
     }
 
     @Override
@@ -64,7 +64,7 @@ public class HomeFragment extends Fragment {
         activity = (AppCompatActivity) view.getContext();
         rv = (RecyclerView) view.findViewById(R.id.cardList);
         rv.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 
@@ -74,6 +74,10 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        llm.scrollToPosition(0);
+        pd2 = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, false);
+        adapter = new RVadapter(getActivity().getApplicationContext(), HomeFragment.mList, null, null, null);
         rv.setAdapter(adapter);
         try {
             LoggedInGuide.mToolbar.setTitle("Popular Destination");
@@ -82,12 +86,13 @@ public class HomeFragment extends Fragment {
             LoggedInTraveler.mToolbar.setTitle("Popular Destination");
             LoggedInTraveler.doubleBackToExitPressedOnce = false;
         }
+
     }
 
     public static void onCardClick(Tours tour){
         LoggedInTraveler.addedFrag = true;
         FragmentBookingRequest fbr = new FragmentBookingRequest(tour);
-        FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+        FragmentTransaction ft = LoggedInTraveler.fm.beginTransaction();
         ft.replace(R.id.drawer_fragment_container, fbr).addToBackStack(null).commit();
     }
 }

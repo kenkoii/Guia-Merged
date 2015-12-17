@@ -15,8 +15,10 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import ph.com.guia.Guide.LoggedInGuide;
 import ph.com.guia.Model.Constants;
 import ph.com.guia.Model.MessageItem;
 import ph.com.guia.Model.PendingRequest;
@@ -36,6 +38,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
     static ViewGroup p;
     public static int count = 0;
     Context context;
+    public static ArrayList<ImageView> pending_image, iv;
 
     public RVadapter(Context context, List<Tours> tours, List<MessageItem> mi, List<User> user, List<PendingRequest> pr) {
         this.tours = tours;
@@ -43,6 +46,9 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
         this.user = user;
         this.pr = pr;
         this.context = context;
+
+        iv = new ArrayList<ImageView>();
+        pending_image = new ArrayList<ImageView>();
     }
 
 
@@ -70,17 +76,25 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(CardViewHolder holder, final int position) {
+    public void onBindViewHolder(CardViewHolder holder, int position) {
+        final int index = position;
+
         if(tours != null) {
             holder.location.setText(tours.get(position).tour_name);
             holder.description.setText(tours.get(position).tour_description);
 
-            holder.cv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    HomeFragment.onCardClick(tours.get(position));
-                }
-            });
+            try {
+                LoggedInGuide.mToolbar.setTitle("Popular Destination");
+            }catch (Exception e) {
+                LoggedInTraveler.mToolbar.setTitle("Popular Destination");
+
+                holder.cv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        HomeFragment.onCardClick(tours.get(index));
+                    }
+                });
+            }
 
             JSONParser parser = new JSONParser(context);
             parser.getImageUrl(tours.get(position).main_image, "HomeImages", position);
@@ -100,7 +114,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
             holder.cv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    User u = user.get(position);
+                    User u = user.get(index);
                     Toast.makeText(p.getContext(), "User: "+u.name, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -119,7 +133,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                 public void onClick(View v) {
                     JSONObject request = new JSONObject();
                     try {
-                        request.accumulate("_id", pr.get(position).booking_id);
+                        request.accumulate("_id", pr.get(index).booking_id);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -151,7 +165,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
         CardView cv, message_view;
         TextView location, description, message_name, message_details, guide_name, guide_gendr_age, guide_tours;
         TextView user_name, user_gender_age, date_booked, tour_booked;
-        public static ImageView iv, message_image, ivAccept, ivDecline, pending_image;
+        public static ImageView message_image, ivAccept, ivDecline;
         RatingBar rb;
 
         CardViewHolder(View itemView) {
@@ -162,7 +176,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
             if(RVadapter.tours != null){
                 location = (TextView) itemView.findViewById(R.id.txtLoc);
                 description = (TextView) itemView.findViewById(R.id.txtDesc);
-                iv = (ImageView) itemView.findViewById(R.id.imageView);
+                iv.add((ImageView) itemView.findViewById(R.id.imageView));
             }
             else if(RVadapter.mi != null) {
                 message_view = (CardView) itemView.findViewById(R.id.card_message);
@@ -183,7 +197,8 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                 tour_booked = (TextView) itemView.findViewById(R.id.pending_tour);
                 ivAccept = (ImageView) itemView.findViewById(R.id.pending_accept_btn);
                 ivDecline = (ImageView) itemView.findViewById(R.id.pending_decline_btn);
-                pending_image = (ImageView) itemView.findViewById(R.id.pending_image);
+                pending_image.add((ImageView) itemView.findViewById(R.id.pending_image));
+
             }
         }
     }

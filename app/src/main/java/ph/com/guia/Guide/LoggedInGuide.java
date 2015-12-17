@@ -39,9 +39,8 @@ public class LoggedInGuide extends AppCompatActivity
     ActionBarDrawerToggle mToggle;
 
     public static String name, bday, gender, age, image, location, contact, email, guide_id, fb_id;
-    FragmentTransaction ft;
+    public static FragmentTransaction ft;
     HomeFragment hf = new HomeFragment();
-    TripFragment tf = new TripFragment();
     SettingFragment sf = new SettingFragment();
     MessageFragment mf = new MessageFragment();
     FilterFragment ff = new FilterFragment();
@@ -161,8 +160,7 @@ public class LoggedInGuide extends AppCompatActivity
                 break;
             case R.id.nav_tours:
                 ft = getSupportFragmentManager().beginTransaction();
-//                PendingFragment pf = new PendingFragment();
-//                ft.replace(R.id.drawer_fragment_container, pf).commit();
+                TripFragment tf = new TripFragment();
                 ft.replace(R.id.drawer_fragment_container, tf).commit();
                 break;
             case R.id.nav_messages:

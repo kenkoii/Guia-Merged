@@ -6,6 +6,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -23,95 +24,100 @@ import ph.com.guia.R;
 import ph.com.guia.Traveler.LoggedInTraveler;
 
 public class TripFragment extends Fragment {
-    //private FragmentTabHost mTabHost;
-    private TabLayout tabLayout;
-    public static ViewPager viewPager;
-    public static ViewPagerAdapter adapter;
-    PendingFragment pf = new PendingFragment();
-    UpcomingFragment uf = new UpcomingFragment();
-    PreviousFragment prf = new PreviousFragment();
+//    private TabLayout tabLayout;
+//    public static ViewPager viewPager;
+//    public static ViewPagerAdapter adapter;
+//    PendingFragment pf = new PendingFragment();
+//    UpcomingFragment uf = new UpcomingFragment();
+//    PreviousFragment prf = new PreviousFragment();
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View inflatedView = inflater.inflate(R.layout.fragment_trip, container, false);
 
-        View view = inflater.inflate(R.layout.fragment_trip, container, false);
-        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
+        TabLayout tabLayout = (TabLayout) inflatedView.findViewById(R.id.tabLayout);
 
-        tabLayout = (TabLayout) view.findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        return view;
-    }
+        try {
+            LoggedInGuide.mToolbar.setTitle("Tours");
+            tabLayout.addTab(tabLayout.newTab().setText("Pending"));
+        }
+        catch(Exception e){}
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.add_tour, menu);
-    }
+        tabLayout.addTab(tabLayout.newTab().setText("Upcoming"));
+        tabLayout.addTab(tabLayout.newTab().setText("Previous"));
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        //mTabHost = null;
-    }
+        final ViewPager viewPager = (ViewPager) inflatedView.findViewById(R.id.viewpager);
 
-    private void setupViewPager(ViewPager viewPager) {
-        if(adapter == null) {
-            Log.e("naa ko ari", "asdasd");
-            adapter = new ViewPagerAdapter(getActivity().getSupportFragmentManager());
-            try {
-                LoggedInGuide.mToolbar.setTitle("Scheduled Tour");
-                adapter.addFragment(pf, "Pending");
-            } catch (Exception e) {
-                LoggedInTraveler.mToolbar.setTitle("Scheduled Tour");
+        viewPager.setAdapter(new PagerAdapter
+                (getFragmentManager(), tabLayout.getTabCount()));
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
             }
 
-            adapter.addFragment(uf, "Upcoming");
-            adapter.addFragment(prf, "Previous");
-        }
-        viewPager.setAdapter(adapter);
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        return inflatedView;
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+    public class PagerAdapter extends FragmentStatePagerAdapter {
+        int mNumOfTabs;
 
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
+        public PagerAdapter(FragmentManager fm, int NumOfTabs) {
+            super(fm);
+            this.mNumOfTabs = NumOfTabs;
         }
 
         @Override
         public Fragment getItem(int position) {
-            return mFragmentList.get(position);
+
+            try {
+                LoggedInGuide.mToolbar.setTitle("Tours");
+
+                switch (position) {
+                    case 0:
+                        PendingFragment pf = new PendingFragment();
+                        return pf;
+                    case 1:
+                        UpcomingFragment uf = new UpcomingFragment();
+                        return uf;
+                    case 2:
+                        PreviousFragment pvf = new PreviousFragment();
+                        return pvf;
+                    default:
+                        return null;
+                }
+            }
+            catch(Exception e){
+                switch (position) {
+                    case 0:
+                        UpcomingFragment uf = new UpcomingFragment();
+                        return uf;
+                    case 1:
+                        PreviousFragment pvf = new PreviousFragment();
+                        return pvf;
+                    default:
+                        return null;
+                }
+            }
         }
 
         @Override
         public int getCount() {
-            return mFragmentList.size();
+            return mNumOfTabs;
         }
-
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        viewPager.setAdapter(adapter);
     }
 }

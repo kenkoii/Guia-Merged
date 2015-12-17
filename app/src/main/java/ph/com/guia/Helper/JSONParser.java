@@ -1,10 +1,13 @@
 package ph.com.guia.Helper;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.support.v4.app.FragmentTabHost;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -37,6 +40,7 @@ import ph.com.guia.Model.Tours;
 import ph.com.guia.Navigation.HomeFragment;
 import ph.com.guia.Navigation.PendingFragment;
 import ph.com.guia.Navigation.TripFragment;
+import ph.com.guia.R;
 import ph.com.guia.RegisterActivity;
 import ph.com.guia.Traveler.FragmentBookingRequest;
 import ph.com.guia.Traveler.LoggedInTraveler;
@@ -44,8 +48,9 @@ import ph.com.guia.Traveler.LoggedInTraveler;
 public class JSONParser {
 
     Context context;
-    public String booking_id, tour_id, user_id, date, tour_name;
+    public String booking_id, date, tour_name;
     RequestQueue mRequestQueue;
+    int size=0;
 
     public JSONParser(Context context) {
         this.context = context;
@@ -69,6 +74,9 @@ public class JSONParser {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.e("Accept Booking", response.toString());
+                        TripFragment tf = new TripFragment();
+                        LoggedInGuide.ft = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, tf).commit();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -100,17 +108,18 @@ public class JSONParser {
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        Log.e("Length", String.valueOf(response.length()));
-                        for(int i = 0; i < response.length()-1; i++){
+                        size = 0;
+                        for(int i = 0; i < response.length(); i++){
                             try {
                                 JSONObject req = response.getJSONObject(i);
-                                if(req.getString("status").equals("pending")) {
+                                if(response.getJSONObject(i).getString("status").equals("pending")) {
+                                    size++;
                                     booking_id = req.getString("_id");
-                                    tour_id = req.getString("booking_tour_id");
-                                    user_id = req.getString("booking_user_id");
+                                    String tour_id = req.getString("booking_tour_id");
+                                    String user_id = req.getString("booking_user_id");
                                     date = req.getString("schedule");
 
-                                    getTourById(Constants.getTourById + tour_id);
+                                    getTourById(Constants.getTourById + tour_id, user_id);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -152,6 +161,7 @@ public class JSONParser {
                         String[] additional_images;
                         int tour_duration, tour_rate, points;
 
+                        size = response.length();
                         for(int i = 0; i < response.length(); i++){
                             try {
                                 JSONObject obj = response.getJSONObject(i);
@@ -173,8 +183,12 @@ public class JSONParser {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            HomeFragment.adapter = new RVadapter(context, HomeFragment.mList, null, null, null);
-                            HomeFragment.rv.setAdapter(HomeFragment.adapter);
+
+                            if(HomeFragment.mList.size() == size-1) {
+                                HomeFragment.adapter = new RVadapter(context, HomeFragment.mList, null, null, null);
+                                HomeFragment.rv.setAdapter(HomeFragment.adapter);
+                                HomeFragment.pd.dismiss();
+                            }
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -186,7 +200,7 @@ public class JSONParser {
        mRequestQueue.add(jsonArrayRequest);
     }
 
-    public void getTourById(String url){
+    public void getTourById(String url, final String user_id){
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, "",
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -222,10 +236,10 @@ public class JSONParser {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        TripFragment.viewPager.setAdapter(TripFragment.adapter);
-                        PendingFragment.adapter = new RVadapter(context, null, null, null, PendingFragment.mList);
-                        PendingFragment.rv.setAdapter(PendingFragment.adapter);
-                        PendingFragment.pd.dismiss();
+                        if(PendingFragment.mList.size() == size) {
+                            PendingFragment.adapter = new RVadapter(context, null, null, null, PendingFragment.mList);
+                            PendingFragment.rv.setAdapter(PendingFragment.adapter);
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -304,6 +318,7 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("POSTLOGIN", error.getMessage());
+                MainActivity.manager.logOut();
                 Toast.makeText(context, "Login Failed, Please try again.", Toast.LENGTH_LONG).show();
             }
         });
@@ -368,7 +383,7 @@ public class JSONParser {
                             intent.putExtra("email", email);
                             intent.putExtra("guide_id", guide_id);
                             context.startActivity(intent);
-                            ((Activity)context).finish();
+                            //((Activity)context).finish();
                         }
                         else{
                             Intent intent = new Intent(context, LoggedInGuide.class);
@@ -430,18 +445,23 @@ public class JSONParser {
                     public void onResponse(Bitmap bitmap) {
                         if(activity.equalsIgnoreCase("LoggedInTraveler")) LoggedInTraveler.nav_image.setImageBitmap(bitmap);
                         else if(activity.equalsIgnoreCase("LoggedInGuide")) LoggedInGuide.nav_image.setImageBitmap(bitmap);
-                        else if(activity.equalsIgnoreCase("HomeImages")) {
-                            RVadapter.CardViewHolder.iv.setImageBitmap(bitmap);
-                            HomeFragment.pd.dismiss();
-                            Log.e(activity, String.valueOf(position));
+                        else if(activity.equalsIgnoreCase("HomeImages")){
+                            RVadapter.iv.get(position).setImageBitmap(bitmap);
+
+                            if(position == HomeFragment.llm.findLastCompletelyVisibleItemPosition()) HomeFragment.pd2.dismiss();
                         }
                         else if(activity.equalsIgnoreCase("FragmentBookingRequest")) FragmentBookingRequest.iv.setImageBitmap(bitmap);
-                        else if(activity.equalsIgnoreCase("AcceptBooking")) RVadapter.CardViewHolder.pending_image.setImageBitmap(bitmap);
+                        else if(activity.equalsIgnoreCase("AcceptBooking")){
+                            RVadapter.pending_image.get(position).setImageBitmap(bitmap);
+
+                            if(position == HomeFragment.llm.findLastCompletelyVisibleItemPosition() ||
+                                    position == size) PendingFragment.pd.dismiss();
+                        }
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
-
+                        VolleyLog.e("GETIMAGEURL", error.getMessage());
                     }
                 });
        mRequestQueue.add(imageRequest);

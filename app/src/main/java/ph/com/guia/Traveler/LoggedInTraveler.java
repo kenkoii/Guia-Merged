@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -50,6 +51,7 @@ public class LoggedInTraveler extends AppCompatActivity
     FilterFragment ff = new FilterFragment();
     GuideCalendarFragment gcf = new GuideCalendarFragment();
     FragmentBookingRequest fcg = new FragmentBookingRequest();
+    public static FragmentManager fm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,7 @@ public class LoggedInTraveler extends AppCompatActivity
         }
         catch(Exception e){}
 
+        fm = getSupportFragmentManager();
         setUpHeader();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

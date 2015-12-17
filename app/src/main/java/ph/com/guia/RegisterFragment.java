@@ -61,7 +61,7 @@ public class RegisterFragment extends Fragment {
                 }
                 else{
                     JSONParser parser = new JSONParser(getActivity().getApplicationContext());
-                    parser.getGuideById(Constants.getGuideById, RegisterActivity.guide_id, "RegisterActivity");
+                    parser.getGuideById(Constants.getGuideById+RegisterActivity.guide_id, RegisterActivity.guide_id, "RegisterActivity");
                 }
             }
         });
