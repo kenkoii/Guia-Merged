@@ -117,12 +117,11 @@ public class MainActivity extends AppCompatActivity {
                             JSONParser parser = new JSONParser(MainActivity.this);
                             parser.postLogin(request, Constants.login);
 
-                            //MainActivity.this.finish();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         pd.dismiss();
-                        //MainActivity.this.finish();
+                        MainActivity.this.finish();
                     }
                 });
         Bundle parameters = new Bundle();

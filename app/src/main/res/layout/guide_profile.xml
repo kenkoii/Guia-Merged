@@ -17,9 +17,9 @@
             android:id="@+id/main_profile_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/profile"
+            android:src="@drawable/default_profile"
             app:border_width="2dp"
-            app:border_color="#FFF"/>
+            app:border_color="#61E24C"/>
 
         <LinearLayout
             android:orientation="vertical"

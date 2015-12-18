@@ -36,6 +36,7 @@ public class LoggedInGuide extends AppCompatActivity
     public static Toolbar mToolbar;
     public static ImageView nav_image;
     TextView nav_name, nav_info;
+    DrawerLayout drawer;
     ActionBarDrawerToggle mToggle;
 
     public static String name, bday, gender, age, image, location, contact, email, guide_id, fb_id;
@@ -70,8 +71,6 @@ public class LoggedInGuide extends AppCompatActivity
         }
         catch(Exception e){}
 
-        setUpHeader();
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,7 +80,9 @@ public class LoggedInGuide extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        setUpHeader();
+
         mToggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(mToggle);
@@ -103,6 +104,15 @@ public class LoggedInGuide extends AppCompatActivity
         parser.getImageUrl(image, "LoggedInGuide", 0);
         nav_name.setText(name);
         nav_info.setText(email);
+
+        nav_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.drawer_fragment_container, gpf).commit();
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
     }
 
     @Override
@@ -177,7 +187,6 @@ public class LoggedInGuide extends AppCompatActivity
                 LoggedInGuide.this.finish();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

@@ -79,7 +79,7 @@ public class FragmentBookingRequest extends Fragment{
                 parser.requestBooking(request, Constants.requestBooking);
                 //JSONObject obj = parser.makeHttpRequest("http://guia.herokuapp.com/api/v1/book", "POST", params);
                 //Toast.makeText(getActivity().getApplicationContext(), "CLicked!"+LoggedInTraveler.user_id, Toast.LENGTH_LONG).show();
-                //getActivity().getSupportFragmentManager().popBackStackImmediate();
+                getActivity().getSupportFragmentManager().popBackStackImmediate();
             }
         });
         return view;

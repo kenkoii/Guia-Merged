@@ -36,7 +36,7 @@ public class MessageFragment extends Fragment {
         else message_part = message;
 
         mList.clear();
-        mList.add(new MessageItem(R.drawable.profile, "Claire Magz", message_part, message));
+        mList.add(new MessageItem(R.drawable.default_profile, "Claire Magz", message_part, message));
     }
 
     @Nullable

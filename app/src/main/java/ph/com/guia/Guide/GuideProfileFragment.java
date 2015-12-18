@@ -13,10 +13,12 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import ph.com.guia.Helper.ImageLoadTask;
+import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.R;
 
 public class GuideProfileFragment extends Fragment {
     String specialty = "Trecking";
+    public static ImageView profImage;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,7 +38,7 @@ public class GuideProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.guide_profile, container, false);
 
-        ImageView profImage = (ImageView) view.findViewById(R.id.main_profile_image);
+        profImage = (ImageView) view.findViewById(R.id.main_profile_image);
         TextView profName = (TextView) view.findViewById(R.id.main_profile_name);
         TextView profEmail = (TextView) view.findViewById(R.id.main_profile_email);
         TextView profAge = (TextView) view.findViewById(R.id.main_profile_age);
@@ -46,7 +48,9 @@ public class GuideProfileFragment extends Fragment {
         RatingBar rb = (RatingBar) view.findViewById(R.id.rating);
 
 
-        new ImageLoadTask(LoggedInGuide.image, profImage).execute();
+        JSONParser parser = new JSONParser(getActivity().getApplicationContext());
+        parser.getImageUrl(LoggedInGuide.image, "GuideProfile", 0);
+
         profName.setText(LoggedInGuide.name);
         profEmail.setText(LoggedInGuide.email);
         profAge.setText(LoggedInGuide.age+" years old");

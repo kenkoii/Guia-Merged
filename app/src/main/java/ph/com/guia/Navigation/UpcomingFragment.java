@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import ph.com.guia.R;
 
 public class UpcomingFragment extends Fragment {
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

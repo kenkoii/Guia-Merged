@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ph.com.guia.Guide.GuideAddInfoFragment;
+import ph.com.guia.Guide.GuideProfileFragment;
 import ph.com.guia.Guide.LoggedInGuide;
 import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
@@ -92,7 +93,7 @@ public class JSONParser {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Toast.makeText(context, response.toString(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, response.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -109,6 +110,7 @@ public class JSONParser {
                     @Override
                     public void onResponse(JSONArray response) {
                         size = 0;
+
                         for(int i = 0; i < response.length(); i++){
                             try {
                                 JSONObject req = response.getJSONObject(i);
@@ -124,6 +126,8 @@ public class JSONParser {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+
+                            if(response.length()-1 == i && size == 0) PendingFragment.pd.dismiss();
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -457,6 +461,8 @@ public class JSONParser {
                             if(position == HomeFragment.llm.findLastCompletelyVisibleItemPosition() ||
                                     position == size) PendingFragment.pd.dismiss();
                         }
+                        else if(activity.equalsIgnoreCase("GuideProfile")) GuideProfileFragment.profImage.setImageBitmap(bitmap);
+
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
