@@ -24,20 +24,22 @@ import ph.com.guia.R;
 import ph.com.guia.Traveler.LoggedInTraveler;
 
 public class TripFragment extends Fragment {
-//    private TabLayout tabLayout;
-//    public static ViewPager viewPager;
-//    public static ViewPagerAdapter adapter;
-//    PendingFragment pf = new PendingFragment();
-//    UpcomingFragment uf = new UpcomingFragment();
-//    PreviousFragment prf = new PreviousFragment();
 
+    public static TabLayout tabLayout;
+    public static ViewPager viewPager;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflatedView = inflater.inflate(R.layout.fragment_trip, container, false);
 
-        TabLayout tabLayout = (TabLayout) inflatedView.findViewById(R.id.tabLayout);
+        tabLayout = (TabLayout) inflatedView.findViewById(R.id.tabLayout);
 
         try {
             LoggedInGuide.mToolbar.setTitle("Tours");
@@ -48,7 +50,7 @@ public class TripFragment extends Fragment {
         tabLayout.addTab(tabLayout.newTab().setText("Upcoming"));
         tabLayout.addTab(tabLayout.newTab().setText("Previous"));
 
-        final ViewPager viewPager = (ViewPager) inflatedView.findViewById(R.id.viewpager);
+        viewPager = (ViewPager) inflatedView.findViewById(R.id.viewpager);
 
         viewPager.setAdapter(new PagerAdapter
                 (getFragmentManager(), tabLayout.getTabCount()));
@@ -71,6 +73,12 @@ public class TripFragment extends Fragment {
         });
 
         return inflatedView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.add_tour, menu);
     }
 
     public class PagerAdapter extends FragmentStatePagerAdapter {

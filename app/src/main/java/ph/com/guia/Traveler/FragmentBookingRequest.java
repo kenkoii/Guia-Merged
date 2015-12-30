@@ -48,7 +48,6 @@ public class FragmentBookingRequest extends Fragment{
         duration = (TextView) view.findViewById(R.id.detail_duration);
         guide = (TextView) view.findViewById(R.id.detail_guide);
 
-        Log.e("TOUR IMAGE", tour.main_image);
         JSONParser parser = new JSONParser(getActivity().getApplicationContext());
         parser.getImageUrl(tour.main_image, "FragmentBookingRequest", 0);
 
@@ -69,7 +68,8 @@ public class FragmentBookingRequest extends Fragment{
                     request.accumulate("booking_guide_id", tour.tour_guideId);
                     request.accumulate("booking_tour_id", tour.tour_id);
                     request.accumulate("booking_user_id", LoggedInTraveler.user_id);
-                    request.accumulate("schedule", "2015-12-12");
+                    request.accumulate("start_date", "12/28/2015");
+                    request.accumulate("end_date", "12/28/2015");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

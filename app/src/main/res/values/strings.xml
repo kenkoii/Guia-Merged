@@ -9,6 +9,9 @@
     <string name="drawer_close">Close</string>
     <string name="action_settings">Settings</string>
 
+    <string name="rate_review">
+        This tour is due, please rate the tour in order to claim your reward.
+    </string>
     <array name="time_format">
         <item>Hour/s</item>
         <item>Day/s</item>

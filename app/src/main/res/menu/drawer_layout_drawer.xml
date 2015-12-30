@@ -24,6 +24,23 @@
             android:title="Logout" />
     </group>
 
+    <!--<item android:title="Tours">-->
+        <!--<menu>-->
+            <!--<item-->
+                <!--android:id="@+id/nav_pending"-->
+                <!--android:icon="@drawable/pending"-->
+                <!--android:title="Pending" />-->
+            <!--<item-->
+                <!--android:id="@+id/nav_upcoming"-->
+                <!--android:icon="@drawable/upcoming"-->
+                <!--android:title="Upcoming" />-->
+            <!--<item-->
+                <!--android:id="@+id/nav_previous"-->
+                <!--android:icon="@drawable/previous"-->
+                <!--android:title="Previous" />-->
+        <!--</menu>-->
+    <!--</item>-->
+
     <item android:title="Communicate">
         <menu>
             <item

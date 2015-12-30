@@ -1,46 +1,86 @@
 package ph.com.guia.Traveler;
 
+import android.app.ProgressDialog;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import ph.com.guia.Helper.DBHelper;
+import ph.com.guia.Helper.JSONParser;
+import ph.com.guia.Helper.RVadapter;
+import ph.com.guia.Model.Constants;
 import ph.com.guia.Model.Tours;
 import ph.com.guia.R;
 
 public class FragmentTripBooking extends Fragment {
 
-    Tours c;
-    TextView name, gender_age, tours;
-    RatingBar rb;
-    Button btnBook;
+    String location, start, end;
+    public static RecyclerView rv;
+    public static LinearLayoutManager llm;
+    public static RVadapter adapter;
+    public static ProgressDialog pd;
+    public static ArrayList<Tours> mList = new ArrayList<Tours>();
 
-//    public FragmentTripBooking(Tours c) {
-//        this.c = c;
-//    }
+    public FragmentTripBooking(String location, String start, String end) {
+        this.location = location;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
+        mList.clear();
+        pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, false);
+
+        //Toast.makeText(getActivity().getApplicationContext(), location, Toast.LENGTH_LONG).show();
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.accumulate("tour_location", location);
+
+            JSONParser parser = new JSONParser(getActivity().getApplicationContext());
+            parser.getAllToursByPreference(jsonObject, Constants.getAllToursByPreference);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_pending_booking, container, false);
+        View view = inflater.inflate(R.layout.fragment_recycler, container, false);
 
-//        name = (TextView) view.findViewById(R.id.course_name);
-//        gender_age = (TextView) view.findViewById(R.id.course_gender_age);
-//        tours = (TextView) view.findViewById(R.id.course_tour);
-//        rb = (RatingBar) view.findViewById(R.id.course_rb);
-//        btnBook = (Button) view.findViewById(R.id.course_book);
-
-//        name.setText(c.user.name);
-//        gender_age.setText(c.user.gender.substring(0,1).toUpperCase()+c.user.gender.substring(1)+", "+
-//                c.user.age);
-//        tours.setText(c.user.tourCount);
-//        rb.setRating(c.user.rating);
+        rv = (RecyclerView) view.findViewById(R.id.cardList);
+        rv.setHasFixedSize(true);
+        llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        rv.setLayoutManager(llm);
 
         return view;
+    }
+
+    public static void onCardClick(Tours tour){
+        LoggedInTraveler.addedFrag = true;
+        FragmentBookingRequest fbr = new FragmentBookingRequest(tour);
+        FragmentTransaction ft = LoggedInTraveler.fm.beginTransaction();
+        ft.replace(R.id.drawer_fragment_container, fbr).addToBackStack(null).commit();
     }
 }

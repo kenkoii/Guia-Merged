@@ -47,7 +47,7 @@ public class GuideAddInfoFragment extends Fragment {
         btnBack = (Button) view.findViewById(R.id.guide1_back);
 
         JSONParser parser = new JSONParser(getActivity().getApplicationContext());
-        parser.getAllLocations(Constants.getAllLocations);
+        parser.getAllLocations(Constants.getAllLocations, "GuideAddInfoFragment");
 
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override

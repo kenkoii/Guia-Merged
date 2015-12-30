@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -20,12 +21,15 @@ import android.widget.Toast;
 
 import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.MainActivity;
+import ph.com.guia.Model.Constants;
 import ph.com.guia.Navigation.FilterFragment;
 import ph.com.guia.Navigation.HomeFragment;
 import ph.com.guia.Navigation.MessageFragment;
 import ph.com.guia.Navigation.PendingFragment;
+import ph.com.guia.Navigation.PreviousFragment;
 import ph.com.guia.Navigation.SettingFragment;
 import ph.com.guia.Navigation.TripFragment;
+import ph.com.guia.Navigation.UpcomingFragment;
 import ph.com.guia.R;
 
 public class LoggedInGuide extends AppCompatActivity
@@ -35,9 +39,12 @@ public class LoggedInGuide extends AppCompatActivity
     static boolean addedFrag = false;
     public static Toolbar mToolbar;
     public static ImageView nav_image;
+    public static FragmentManager fm;
+
     TextView nav_name, nav_info;
     DrawerLayout drawer;
     ActionBarDrawerToggle mToggle;
+
 
     public static String name, bday, gender, age, image, location, contact, email, guide_id, fb_id;
     public static FragmentTransaction ft;
@@ -45,7 +52,7 @@ public class LoggedInGuide extends AppCompatActivity
     SettingFragment sf = new SettingFragment();
     MessageFragment mf = new MessageFragment();
     FilterFragment ff = new FilterFragment();
-    GuideProfileFragment gpf = new GuideProfileFragment();
+    //GuideProfileFragment gpf = new GuideProfileFragment();
     GuideCalendarFragment gcf = new GuideCalendarFragment();
     CreateTourFragment aif = new CreateTourFragment();
 
@@ -56,6 +63,7 @@ public class LoggedInGuide extends AppCompatActivity
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
+        fm = getSupportFragmentManager();
         try{
             Bundle b = this.getIntent().getExtras();
             fb_id = b.getString("fb_id");
@@ -108,8 +116,9 @@ public class LoggedInGuide extends AppCompatActivity
         nav_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.drawer_fragment_container, gpf).commit();
+//                ft = getSupportFragmentManager().beginTransaction();
+//                ft.replace(R.id.drawer_fragment_container, gpf).commit();
+                JSONParser.getInstance(LoggedInGuide.this).getGuideById(Constants.getGuideById+guide_id, guide_id, "GuideProfile");
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
@@ -181,6 +190,18 @@ public class LoggedInGuide extends AppCompatActivity
                 ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.drawer_fragment_container, sf).commit();
                 break;
+//            case R.id.nav_pending:
+//                ft = getSupportFragmentManager().beginTransaction();
+//                ft.replace(R.id.drawer_fragment_container, pdf).commit();
+//                break;
+//            case R.id.nav_upcoming:
+//                ft = getSupportFragmentManager().beginTransaction();
+//                ft.replace(R.id.drawer_fragment_container, upf).commit();
+//                break;
+//            case R.id.nav_previous:
+//                ft = getSupportFragmentManager().beginTransaction();
+//                ft.replace(R.id.drawer_fragment_container, pvf).commit();
+//                break;
             case R.id.nav_logout:
                 MainActivity.manager.logOut();
                 LoggedInGuide.mToolbar = null;

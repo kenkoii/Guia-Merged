@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:orientation="vertical"
@@ -11,7 +11,7 @@
         <ImageView
             android:id="@+id/detail_main_image"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="wrap_content"
             android:src="@drawable/default_home_image"/>
 
         <TextView
@@ -83,9 +83,10 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"/>
 
-        <ScrollView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:padding="10dp">
 
             <TextView
@@ -98,34 +99,32 @@
                 android:layout_below="@id/txtLoc"
                 android:layout_marginLeft="15dp"/>
 
-        </ScrollView>
-
-    </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
-
-        <LinearLayout
-            android:orientation="horizontal"
+        </LinearLayout>
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:padding="25dp">
+            android:layout_gravity="bottom">
 
-
-            <Button
-                android:id="@+id/detail_book"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Book"
-                android:background="@drawable/rounded_button"
-                android:elevation="4dp"
-                android:layout_marginLeft="5dp"
-                android:textColor="#fff"/>
+                android:layout_alignParentBottom="true"
+                android:padding="25dp">
 
-        </LinearLayout>
-    </RelativeLayout>
-</LinearLayout>
+
+                <Button
+                    android:id="@+id/detail_book"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Book"
+                    android:background="@drawable/rounded_button"
+                    android:elevation="4dp"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="#fff"/>
+
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>

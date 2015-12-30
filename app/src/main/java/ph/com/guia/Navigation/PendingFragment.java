@@ -22,6 +22,7 @@ import ph.com.guia.Helper.RVadapter;
 import ph.com.guia.Model.Constants;
 import ph.com.guia.Model.PendingRequest;
 import ph.com.guia.R;
+import ph.com.guia.Traveler.LoggedInTraveler;
 
 public class PendingFragment extends Fragment {
 
@@ -33,7 +34,7 @@ public class PendingFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, false);
+        pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);
 
         mList.clear();
         if(!LoggedInGuide.guide_id.equals("")) {
@@ -45,7 +46,7 @@ public class PendingFragment extends Fragment {
             }
 
             JSONParser parser = new JSONParser(getActivity());
-            parser.getBookingsByGuideId(request, Constants.getBookingsByGuideId);
+            parser.getBookingsById(request, Constants.getBookingsByGuideId, "PendingFragment");
         }
     }
 
@@ -60,8 +61,6 @@ public class PendingFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 
-//        adapter = new RVadapter(getActivity().getApplicationContext(), null, null, null, mList);
-//        rv.setAdapter(adapter);
         return view;
     }
 }

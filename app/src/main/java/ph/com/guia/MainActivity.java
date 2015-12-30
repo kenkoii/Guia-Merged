@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     public static boolean end = false;
     public static LoginManager manager;
     public static String fb_id, image, name, bday, gender, age;
+    public static ProgressDialog pd;
     DBHelper db = new DBHelper(this);
 
     @Override
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void requestData(AccessToken token){
-        final ProgressDialog pd = ProgressDialog.show(this, "Loading", "Please wait...", true, false);
+        pd = ProgressDialog.show(this, "Loading", "Please wait...", true, false);
         GraphRequest request = GraphRequest.newMeRequest(token,
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         pd.dismiss();
-                        MainActivity.this.finish();
+                        //MainActivity.this.finish();
                     }
                 });
         Bundle parameters = new Bundle();

@@ -135,7 +135,6 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.e("Here", "Still Working");
         switch (requestCode) {
             case 1:
                 main_imageUri = data.getData();

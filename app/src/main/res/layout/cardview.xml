@@ -17,16 +17,20 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
-        <ImageView
+        <RelativeLayout
+            android:id="@+id/due"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:adjustViewBounds="true"
-            android:src="@drawable/default_home_image"/>
+            android:gravity="center_vertical"
+            android:foregroundGravity="center_vertical">
+
+            <com.android.volley.toolbox.NetworkImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:adjustViewBounds="true"
+                android:src="@drawable/default_home_image"/>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/txtLoc"

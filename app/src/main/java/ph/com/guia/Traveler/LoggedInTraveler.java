@@ -28,8 +28,10 @@ import ph.com.guia.Model.Constants;
 import ph.com.guia.Navigation.FilterFragment;
 import ph.com.guia.Navigation.HomeFragment;
 import ph.com.guia.Navigation.MessageFragment;
+import ph.com.guia.Navigation.PreviousFragment;
 import ph.com.guia.Navigation.SettingFragment;
 import ph.com.guia.Navigation.TripFragment;
+import ph.com.guia.Navigation.UpcomingFragment;
 import ph.com.guia.R;
 
 public class LoggedInTraveler extends AppCompatActivity
@@ -45,12 +47,11 @@ public class LoggedInTraveler extends AppCompatActivity
     public static String name, bday, gender, age, image, fb_id, user_id;
     FragmentTransaction ft;
     HomeFragment hf = new HomeFragment();
-    TripFragment tf = new TripFragment();
     SettingFragment sf = new SettingFragment();
     MessageFragment mf = new MessageFragment();
     FilterFragment ff = new FilterFragment();
     GuideCalendarFragment gcf = new GuideCalendarFragment();
-    FragmentBookingRequest fcg = new FragmentBookingRequest();
+    FragmentNewTrip fnt = new FragmentNewTrip();
     public static FragmentManager fm;
 
     @Override
@@ -104,17 +105,13 @@ public class LoggedInTraveler extends AppCompatActivity
         nav_name = (TextView) findViewById(R.id.nav_name);
         nav_info = (TextView) findViewById(R.id.nav_info);
 
-        JSONParser parser = new JSONParser(this);
-        parser.getImageUrl(image, "LoggedInTraveler", 0);
+        JSONParser.getInstance(this).getImageUrl(image, "LoggedInTraveler", 0);
         nav_name.setText(name);
         nav_info.setText(gender.substring(0,1).toUpperCase()+gender.substring(1)+", "+age);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -139,7 +136,7 @@ public class LoggedInTraveler extends AppCompatActivity
                 mToolbar.setTitle("Schedules");
                 addedFrag = true;
                 ft = getSupportFragmentManager().beginTransaction();
-                //ft.replace(R.id.drawer_fragment_container, fcg).addToBackStack(null).commit();
+                ft.replace(R.id.drawer_fragment_container, fnt).addToBackStack(null).commit();
                 break;
             case R.id.done:
                 addedFrag = false;
@@ -164,6 +161,7 @@ public class LoggedInTraveler extends AppCompatActivity
                 break;
             case R.id.nav_tours:
                 ft = getSupportFragmentManager().beginTransaction();
+                TripFragment tf = new TripFragment();
                 ft.replace(R.id.drawer_fragment_container, tf).commit();
                 break;
             case R.id.nav_messages:

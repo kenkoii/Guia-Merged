@@ -28,9 +28,9 @@ import ph.com.guia.Traveler.LoggedInTraveler;
 public class HomeFragment extends Fragment {
     static AppCompatActivity activity;
     public static RecyclerView rv;
-    public static RVadapter adapter;
-    public static ProgressDialog pd, pd2;
     public static LinearLayoutManager llm;
+    public static RVadapter adapter;
+    public static ProgressDialog pd;
     public static ArrayList<Tours> mList = new ArrayList<Tours>();
 
     @Override
@@ -39,7 +39,6 @@ public class HomeFragment extends Fragment {
         setHasOptionsMenu(true);
 
         mList.clear();
-        pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, false);
         JSONParser parser = new JSONParser(getActivity().getApplicationContext());
         parser.getAllTours(Constants.getAllTours);
     }
@@ -76,7 +75,7 @@ public class HomeFragment extends Fragment {
         super.onResume();
 
         llm.scrollToPosition(0);
-        pd2 = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, false);
+        pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);
         adapter = new RVadapter(getActivity().getApplicationContext(), HomeFragment.mList, null, null, null);
         rv.setAdapter(adapter);
         try {

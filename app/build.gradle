@@ -32,4 +32,5 @@ dependencies {
     compile 'com.yahoo.mobile.client.android.util.rangeseekbar:rangeseekbar-library:0.1.0'
     compile 'com.prolificinteractive:material-calendarview:0.7.0'
     compile 'com.cloudinary:cloudinary-android:1.2.2'
+    compile 'com.wdullaer:materialdatetimepicker:2.1.1'
 }
