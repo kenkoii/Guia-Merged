@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.LruCache;
 import android.util.Log;
@@ -174,7 +175,6 @@ public class JSONParser {
                                         PendingFragment.mList.add(new PendingRequest(user_name, user_age, user_gender,
                                                 tour_name, date, booking_id, image));
                                         //getTourById(Constants.getTourById + tour_id, user_id, booking_id, date, activity);
-                                        Log.e("penlist", PendingFragment.mList.size()+"");
                                     }
 
                                     if(i == response.length()-1) {
@@ -222,7 +222,8 @@ public class JSONParser {
                         }
 
                         if(response.length() == 0 && activity.equalsIgnoreCase("PendingFragment")) PendingFragment.pd.dismiss();
-                        if(response.length() == 0 && activity.equalsIgnoreCase("UpcomingFragment")) UpcomingFragment.pd.dismiss();
+                        else if(response.length() == 0 && activity.equalsIgnoreCase("UpcomingFragment") ||
+                                activity.equalsIgnoreCase("UpcomingTraveler")) UpcomingFragment.pd.dismiss();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -628,8 +629,12 @@ public class JSONParser {
                         }
                         else if(activity.equalsIgnoreCase("GuideProfile")){
                             try {
-                                GuideProfileFragment gpf = new GuideProfileFragment(response.getDouble("rating"),
-                                        response.getString("type"));
+                                Bundle bundle = new Bundle();
+                                bundle.putDouble("rating", response.getDouble("rating"));
+                                bundle.putString("type", response.getString("type"));
+                                GuideProfileFragment gpf = new GuideProfileFragment();
+                                gpf.setArguments(bundle);
+
                                 FragmentTransaction ft = LoggedInGuide.fm.beginTransaction();
                                 ft.replace(R.id.drawer_fragment_container, gpf).commit();
                             } catch (JSONException e) {

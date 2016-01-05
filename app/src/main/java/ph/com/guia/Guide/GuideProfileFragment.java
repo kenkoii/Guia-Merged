@@ -37,16 +37,14 @@ public class GuideProfileFragment extends Fragment {
     double rating;
     String type;
 
-    public GuideProfileFragment(double rating, String type) {
-        this.rating = rating;
-        this.type = type;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         LoggedInGuide.mToolbar.setTitle("Profile");
+
+        rating = getArguments().getDouble("rating");
+        type = getArguments().getString("type");
     }
 
     @Override

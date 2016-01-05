@@ -33,15 +33,13 @@ public class CompleteTourFragment extends Fragment{
     TextView title, rate, date, traveler_name, description;
     Button btnComplete;
 
-    public CompleteTourFragment(Tours tour, boolean ok) {
-        this.tour = tour;
-        this.ok = ok;
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_complete_tour, container, false);
+
+        tour = getArguments().getParcelable("tour");
+        ok = getArguments().getBoolean("ok");
 
         LoggedInGuide.addedFrag = true;
         image = (NetworkImageView) view.findViewById(R.id.upcoming_main_image);

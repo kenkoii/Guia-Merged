@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -53,6 +54,7 @@ public class LoggedInTraveler extends AppCompatActivity
     GuideCalendarFragment gcf = new GuideCalendarFragment();
     FragmentNewTrip fnt = new FragmentNewTrip();
     public static FragmentManager fm;
+    public static LayoutInflater inflater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,8 @@ public class LoggedInTraveler extends AppCompatActivity
         catch(Exception e){}
 
         fm = getSupportFragmentManager();
+        inflater = getLayoutInflater();
+
         setUpHeader();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

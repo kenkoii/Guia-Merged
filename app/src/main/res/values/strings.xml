@@ -10,7 +10,7 @@
     <string name="action_settings">Settings</string>
 
     <string name="rate_review">
-        This tour is due, please rate the tour in order to claim your reward.
+        This tour was marked as done, please rate the tour in order to claim your reward.
     </string>
     <array name="time_format">
         <item>Hour/s</item>

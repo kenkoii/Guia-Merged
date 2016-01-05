@@ -1,13 +1,20 @@
 package ph.com.guia.Helper;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
@@ -22,7 +29,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -126,7 +132,6 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
             iv.setLayoutParams(params);
-            iv.setImageResource(R.drawable.due);
 
             try {
                 LoggedInGuide.mToolbar.setTitle("Popular Destination");
@@ -139,8 +144,6 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                     boolean dueTour = false;
                     Calendar now = Calendar.getInstance();
 
-                    Log.e("das", month+" "+day+" "+year);
-
                     if(year < now.get(Calendar.YEAR)) dueTour=true;
                     else if(year == now.get(Calendar.YEAR)){
                         if(month < now.get(Calendar.MONTH)+1) dueTour = true;
@@ -151,6 +154,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
 
                     if(dueTour){
                         if(position < holder.due.size()) {
+                            iv.setImageResource(R.drawable.due);
                             holder.due.get(position).addView(iv);
                             ok[position] = true;
                         }
@@ -163,7 +167,14 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                             if(tours.get(index).activity.equalsIgnoreCase("UpcomingFragment")){
                                 try{
                                     LoggedInGuide.mToolbar.setTitle("Tours");
-                                    CompleteTourFragment ctf = new CompleteTourFragment(tours.get(index), ok[index]);
+
+                                    Bundle bundle = new Bundle();
+                                    bundle.putParcelable("tour", tours.get(index));
+                                    bundle.putBoolean("ok", ok[index]);
+
+                                    CompleteTourFragment ctf = new CompleteTourFragment();
+                                    ctf.setArguments(bundle);
+
                                     FragmentTransaction ft = LoggedInGuide.fm.beginTransaction();
                                     ft.add(R.id.drawer_fragment_container, ctf).addToBackStack(null).commit();
                                 }catch (Exception e){
@@ -175,12 +186,11 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                 }
             }catch (Exception e) {
                 LoggedInTraveler.mToolbar.setTitle("Popular Destination");
-                Log.e("asdadasd", tours.get(index).activity.equalsIgnoreCase("UpcomingTraveler")+" "
-                    +tours.get(index).tour_id.equalsIgnoreCase("completed")+" "
-                    +(position < holder.due.size())+"  "+tours.get(index).tour_id);
+
                 if(tours.get(index).activity.equalsIgnoreCase("UpcomingTraveler")){
                     if(tours.get(index).tour_id.equalsIgnoreCase("completed")){
                         if(position < holder.due.size()) {
+                            iv.setImageResource(R.drawable.done);
                             holder.due.get(position).addView(iv);
                             ok[position] = true;
                         }
@@ -194,6 +204,44 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                             HomeFragment.onCardClick(tours.get(index));
                         else if(tours.get(index).activity.equalsIgnoreCase("FragmentTripBooking"))
                             FragmentTripBooking.onCardClick(tours.get(index));
+                        else if(tours.get(index).activity.equalsIgnoreCase("UpcomingTraveler")){
+                            View view = LoggedInTraveler.inflater.inflate(R.layout.rate_review, p, false);
+                            final RatingBar rate_bar = (RatingBar) view.findViewById(R.id.rate_bar);
+                            final EditText review_text = (EditText) view.findViewById(R.id.review_text);
+                            NetworkImageView niv = (NetworkImageView) view.findViewById(R.id.rate_rev_image);
+                            imageLoader = JSONParser.getInstance(context).getImageLoader();
+                            imageLoader.get(tours.get(index).main_image, ImageLoader.getImageListener(holder.iv,
+                                    R.drawable.default_home_image, android.R.drawable.ic_dialog_alert));
+
+                            holder.iv.setImageUrl(tours.get(index).main_image, imageLoader);
+
+                            Drawable progress = rate_bar.getProgressDrawable();
+                            DrawableCompat.setTint(progress, Color.YELLOW);
+//                            Drawable drawable = rate_bar.getProgressDrawable();
+//                            drawable.setColorFilter(Color.parseColor("#FFFDEC00"), PorterDuff.Mode.SRC_ATOP);
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setIcon(R.drawable.ic_launcher);
+                            builder.setView(view);
+                            builder.setTitle("Rate and Review");
+                            builder.setNegativeButton("Back", null);
+                            builder.setPositiveButton("Done", null);
+                            final AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+
+                            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if(rate_bar.getRating() == 0) Toast.makeText(context, "Please rate the tour!",
+                                            Toast.LENGTH_SHORT).show();
+                                    else if(review_text.getText().toString().equalsIgnoreCase(""))
+                                        review_text.setError("Please give some review!");
+                                    else{
+                                        Toast.makeText(context, "Done!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
                     }
                 });
             }

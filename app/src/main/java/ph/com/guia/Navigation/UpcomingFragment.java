@@ -41,6 +41,7 @@ public class UpcomingFragment extends Fragment {
         mList.clear();
 
         try {
+            LoggedInGuide.mToolbar.setTitle("Tours");
             if (!LoggedInGuide.guide_id.equals("")) {
                 JSONObject request = new JSONObject();
                 try {
