@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.LruCache;
@@ -701,7 +702,10 @@ public class JSONParser {
                     @Override
                     public void onResponse(Bitmap bitmap) {
                         if(activity.equalsIgnoreCase("LoggedInTraveler")) LoggedInTraveler.nav_image.setImageBitmap(bitmap);
-                        else if(activity.equalsIgnoreCase("LoggedInGuide")) LoggedInGuide.nav_image.setImageBitmap(bitmap);
+                        else if(activity.equalsIgnoreCase("LoggedInGuide")){
+                            LoggedInGuide.nav_image.setImageBitmap(bitmap);
+                            getImageUrl(MainActivity.cover, "LoggedInGuideCover", 0);
+                        }
                         else if(activity.equalsIgnoreCase("HomeImages")){
                             //RVadapter.iv.get(position).setImageBitmap(bitmap);
                             if(position == HomeFragment.llm.findLastCompletelyVisibleItemPosition() ||
@@ -714,6 +718,10 @@ public class JSONParser {
                                     position == size) PendingFragment.pd.dismiss();
                         }
                         else if(activity.equalsIgnoreCase("GuideProfile")) GuideProfileFragment.profImage.setImageBitmap(bitmap);
+                        else if(activity.equalsIgnoreCase("LoggedInGuideCover")){
+                            BitmapDrawable background = new BitmapDrawable(bitmap);
+                            LoggedInGuide.nav_cover.setBackgroundDrawable(background);
+                        }
 
                     }
                 }, 0, 0, null,
