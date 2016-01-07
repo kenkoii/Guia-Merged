@@ -1,35 +1,26 @@
 package ph.com.guia.Guide;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.SharePhoto;
-import com.facebook.share.model.SharePhotoContent;
-import com.facebook.share.widget.ShareDialog;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import ph.com.guia.Helper.JSONParser;
@@ -38,11 +29,9 @@ import ph.com.guia.Model.Constants;
 import ph.com.guia.Navigation.FilterFragment;
 import ph.com.guia.Navigation.HomeFragment;
 import ph.com.guia.Navigation.MessageFragment;
-import ph.com.guia.Navigation.PendingFragment;
-import ph.com.guia.Navigation.PreviousFragment;
 import ph.com.guia.Navigation.SettingFragment;
+import ph.com.guia.Navigation.ShareFragment;
 import ph.com.guia.Navigation.TripFragment;
-import ph.com.guia.Navigation.UpcomingFragment;
 import ph.com.guia.R;
 
 public class LoggedInGuide extends AppCompatActivity
@@ -54,6 +43,7 @@ public class LoggedInGuide extends AppCompatActivity
     public static ImageView nav_image;
     public static LinearLayout nav_cover;
     public static FragmentManager fm;
+    ArrayList<SharePhoto> photos = new ArrayList<SharePhoto>();
 
     TextView nav_name, nav_info;
     DrawerLayout drawer;
@@ -69,6 +59,7 @@ public class LoggedInGuide extends AppCompatActivity
     //GuideProfileFragment gpf = new GuideProfileFragment();
     GuideCalendarFragment gcf = new GuideCalendarFragment();
     CreateTourFragment aif = new CreateTourFragment();
+    ShareFragment shf = new ShareFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +67,8 @@ public class LoggedInGuide extends AppCompatActivity
         setContentView(R.layout.drawer_layout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
+
+        MainActivity.manager.getInstance().logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
 
         fm = getSupportFragmentManager();
         try{
@@ -207,29 +200,27 @@ public class LoggedInGuide extends AppCompatActivity
                 ft.replace(R.id.drawer_fragment_container, sf).commit();
                 break;
             case R.id.nav_share:
-//                MainActivity.manager.getInstance().logInWithPublishPermissions(
-//                        this,
-//                        Arrays.asList("publish_actions"));
-                try{
-                    //Uri img = data.getData();
-                    ShareDialog shareDialog = new ShareDialog(this);
-
-                    if (ShareDialog.canShow(SharePhotoContent.class)) {
-                        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(),
-                                R.drawable.guia_logo);
-                        SharePhoto photo = new SharePhoto.Builder()
-                                .setBitmap(bitmap)
-                                .build();
-                        SharePhotoContent content = new SharePhotoContent.Builder()
-                                .addPhoto(photo)
-                                .build();
-
-                        shareDialog.show(content);
-                    }
-
-                }catch (Exception e){e.printStackTrace();}
-//                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                this.startActivityForResult(intent, 1);
+                ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.drawer_fragment_container, shf).commit();
+//                Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.guia_logo);
+//                Bitmap image1 = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+//                SharePhoto photo1 = new SharePhoto.Builder()
+//                        .setBitmap(image)
+//                        .setCaption("Photo 1")
+//                        .build();
+//                SharePhoto photo2 = new SharePhoto.Builder()
+//                        .setBitmap(image1)
+//                        .setCaption("Photo 2")
+//                        .build();
+//
+//                photos.add(photo1);
+//                photos.add(photo2);
+//
+//                SharePhotoContent content = new SharePhotoContent.Builder()
+//                        .addPhotos(photos)
+//                        .build();
+//
+//                ShareApi.share(content, null);
                 break;
 //            case R.id.nav_pending:
 //                ft = getSupportFragmentManager().beginTransaction();
@@ -251,30 +242,6 @@ public class LoggedInGuide extends AppCompatActivity
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        try{
-            Uri img = data.getData();
-            ShareDialog shareDialog = new ShareDialog(this);
-
-            if (ShareDialog.canShow(SharePhotoContent.class)) {
-                Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(),
-                        R.drawable.guia_logo);
-                SharePhoto photo = new SharePhoto.Builder()
-                        .setBitmap(bitmap)
-                        .build();
-                SharePhotoContent content = new SharePhotoContent.Builder()
-                        .addPhoto(photo)
-                        .build();
-
-                shareDialog.show(content);
-            }
-
-        }catch (Exception e){e.printStackTrace();}
     }
 
     @Override
