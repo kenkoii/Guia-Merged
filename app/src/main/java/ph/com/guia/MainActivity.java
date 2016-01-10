@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     public static LoginButton loginButton;
     public static boolean end = false;
     public static LoginManager manager;
-    public static String fb_id, image, name, bday, gender, age, cover;
+    public static String fb_id, image, name, bday, gender, age, cover, user_id;
+    public static double points;
     public static ProgressDialog pd;
     DBHelper db = new DBHelper(this);
 

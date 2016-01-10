@@ -34,6 +34,7 @@ import java.util.StringTokenizer;
 
 import ph.com.guia.Guide.CompleteTourFragment;
 import ph.com.guia.Guide.LoggedInGuide;
+import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
 import ph.com.guia.Model.MessageItem;
 import ph.com.guia.Model.PendingRequest;
@@ -232,12 +233,35 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    if(rate_bar.getRating() == 0) Toast.makeText(context, "Please rate the tour!",
+                                    String review = review_text.getText().toString();
+                                    double rate = rate_bar.getRating();
+                                    if(rate == 0) Toast.makeText(context, "Please rate the tour!",
                                             Toast.LENGTH_SHORT).show();
-                                    else if(review_text.getText().toString().equalsIgnoreCase(""))
+                                    else if(review.equalsIgnoreCase(""))
                                         review_text.setError("Please give some review!");
                                     else{
-                                        Toast.makeText(context, "Done!", Toast.LENGTH_SHORT).show();
+                                        try{
+                                            JSONObject user = new JSONObject();
+                                            user.accumulate("id", MainActivity.user_id);
+                                            user.accumulate("facebook_id", MainActivity.fb_id);
+                                            user.accumulate("name", MainActivity.name);
+                                            user.accumulate("profImage", MainActivity.image);
+
+                                            Log.e("ID: ", tours.get(index).tour_location);
+                                            JSONObject request = new JSONObject();
+                                            request.accumulate("review", review);
+                                            request.accumulate("rating", rate);
+                                            request.accumulate("points", tours.get(index).tour_rate * 0.05);
+                                            request.accumulate("review_guide_id", tours.get(index).tour_guideId);
+                                            request.accumulate("review_booking_id", tours.get(index).tour_location);
+                                            request.accumulate("user", user);
+
+                                            JSONParser.getInstance(context).postRateReview(request, Constants.postRateReview);
+                                        } catch (JSONException e1) {
+                                            e1.printStackTrace();
+                                        }
+
+                                        alertDialog.dismiss();
                                     }
                                 }
                             });

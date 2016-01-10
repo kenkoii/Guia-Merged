@@ -26,5 +26,10 @@ public class Constants {
     public static String getUserById = "http://guia.herokuapp.com/api/v1/user/";
 
     public static String getReviewsByGuideId= "http://guia.herokuapp.com/api/v1/review/";
+    public static String postRateReview= "http://guia.herokuapp.com/api/v1/review";
+
+    public static String shareAlbum= "http://guia.herokuapp.com/api/v1/album";
+
+    public static String getPreferences= "http://guia.herokuapp.com/api/v1/preferences";
 
 }

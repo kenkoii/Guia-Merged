@@ -31,11 +31,9 @@
             android:id="@+id/spnrLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:hint="Location"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@drawable/rounded_edittext"
-            />
+            android:background="@drawable/rounded_edittext" />
 
         <EditText
             android:id="@+id/txtContact"
@@ -68,55 +66,12 @@
             android:layout_marginTop="20dp"/>
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:id="@+id/preferences_holder"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Food"/>
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Outdoor"/>
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Culture"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Music"/>
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Art"/>
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Nightlife"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
+            android:layout_marginLeft="20dp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"

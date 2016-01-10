@@ -5,12 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.LruCache;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.Cache;
@@ -27,6 +32,8 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,14 +42,15 @@ import org.json.JSONObject;
 import ph.com.guia.Guide.GuideAddInfoFragment;
 import ph.com.guia.Guide.GuideProfileFragment;
 import ph.com.guia.Guide.LoggedInGuide;
+import ph.com.guia.Traveler.TravelerProfileFragment;
 import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
 import ph.com.guia.Model.PendingRequest;
 import ph.com.guia.Model.Tours;
-import ph.com.guia.Model.User;
 import ph.com.guia.Model.review;
 import ph.com.guia.Navigation.HomeFragment;
 import ph.com.guia.Navigation.PendingFragment;
+import ph.com.guia.Navigation.ShareFragment;
 import ph.com.guia.Navigation.TripFragment;
 import ph.com.guia.Navigation.UpcomingFragment;
 import ph.com.guia.R;
@@ -484,6 +492,9 @@ public class JSONParser {
                             String user_id = response.getString("_id");
                             String guide_id = response.getString("guide_id");
 
+                            MainActivity.user_id = user_id;
+                            MainActivity.points = response.getDouble("points");
+
                             DBHelper db = new DBHelper(context);
                             Cursor c = db.getSettingById(MainActivity.fb_id);
                             if(!c.moveToFirst()) {
@@ -611,6 +622,7 @@ public class JSONParser {
                             intent.putExtra("contact", contact);
                             intent.putExtra("email", email);
                             intent.putExtra("guide_id", guide_id);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(intent);
                             //((Activity)context).finish();
                         }
@@ -626,6 +638,7 @@ public class JSONParser {
                             intent.putExtra("contact", contact);
                             intent.putExtra("email", email);
                             intent.putExtra("guide_id", RegisterActivity.guide_id);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(intent);
                         }
                         else if(activity.equalsIgnoreCase("GuideProfile")){
@@ -701,7 +714,10 @@ public class JSONParser {
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
-                        if(activity.equalsIgnoreCase("LoggedInTraveler")) LoggedInTraveler.nav_image.setImageBitmap(bitmap);
+                        if(activity.equalsIgnoreCase("LoggedInTraveler")){
+                            LoggedInTraveler.nav_image.setImageBitmap(bitmap);
+                            getImageUrl(MainActivity.cover, "LoggedInTravelerCover", 0);
+                        }
                         else if(activity.equalsIgnoreCase("LoggedInGuide")){
                             LoggedInGuide.nav_image.setImageBitmap(bitmap);
                             getImageUrl(MainActivity.cover, "LoggedInGuideCover", 0);
@@ -718,9 +734,22 @@ public class JSONParser {
                                     position == size) PendingFragment.pd.dismiss();
                         }
                         else if(activity.equalsIgnoreCase("GuideProfile")) GuideProfileFragment.profImage.setImageBitmap(bitmap);
+                        else if(activity.equalsIgnoreCase("TravelerProfile")) TravelerProfileFragment.profImage.setImageBitmap(bitmap);
                         else if(activity.equalsIgnoreCase("LoggedInGuideCover")){
                             BitmapDrawable background = new BitmapDrawable(bitmap);
                             LoggedInGuide.nav_cover.setBackgroundDrawable(background);
+                        }
+                        else if(activity.equalsIgnoreCase("LoggedInTravelerCover")){
+                            BitmapDrawable background = new BitmapDrawable(bitmap);
+                            LoggedInTraveler.nav_cover.setBackgroundDrawable(background);
+                        }
+                        else if(activity.equalsIgnoreCase("GuideProfileCover")){
+                            BitmapDrawable background = new BitmapDrawable(bitmap);
+                            GuideProfileFragment.guide_profile_cover.setBackgroundDrawable(background);
+                        }
+                        else if(activity.equalsIgnoreCase("TravelerProfileCover")){
+                            BitmapDrawable background = new BitmapDrawable(bitmap);
+                            TravelerProfileFragment.traveler_profile_cover.setBackgroundDrawable(background);
                         }
 
                     }
@@ -764,6 +793,103 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETREVIEWBYGUIDEID", error.getMessage());
+            }
+        });
+        mRequestQueue.add(jsonArrayRequest);
+    }
+
+    public void shareAlbum(final JSONObject request, String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if (ShareDialog.canShow(ShareLinkContent.class)) {
+                                ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                                        .setContentTitle(response.getString("album_name"))
+                                        .setContentDescription(response.getString("description"))
+                                        .setContentUrl(Uri.parse("http://guia.herokuapp.com/album?id="+response.getString("_id")))
+                                        .setImageUrl(Uri.parse(response.getJSONArray("images").get(0).toString()))
+                                        .build();
+
+                                ShareFragment.shareDialog.show(linkContent);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("SHAREALBUM", error.getMessage());
+            }
+        });
+        mRequestQueue.add(jsonObjectRequest);
+    }
+
+    public void postRateReview(final JSONObject request, String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("POSTRATEREVIEW", error.getMessage());
+            }
+        });
+        mRequestQueue.add(jsonObjectRequest);
+    }
+
+    public void getPreferences(String url, final String activity){
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, "",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        if(activity.equalsIgnoreCase("GuideAddInfo")) {
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                            LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(0,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                            params2.weight = 1;
+
+                            LinearLayout ll = new LinearLayout(context);
+                            int count = 0;
+                            for (int i = 0; i < response.length(); i++) {
+                                try {
+                                    if (response.getJSONObject(i).getBoolean("isActivated")) {
+                                        CheckBox cb = new CheckBox(context);
+                                        cb.setId(i + 1);
+                                        cb.setText(response.getJSONObject(i).getString("preference"));
+                                        cb.setTextColor(Color.BLACK);
+                                        cb.setLayoutParams(params2);
+
+                                        ll.addView(cb);
+                                        count++;
+                                        if (count == 2) {
+                                            GuideAddInfoFragment.linearLayout.addView(ll);
+                                            ll = new LinearLayout(context);
+                                            ll.setOrientation(LinearLayout.HORIZONTAL);
+                                            ll.setLayoutParams(params);
+                                            count = 0;
+                                        } else {
+                                            if (i == response.length() - 1) {
+                                                GuideAddInfoFragment.linearLayout.addView(ll);
+                                            }
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("GETPREFERENCES", error.getMessage());
             }
         });
         mRequestQueue.add(jsonArrayRequest);

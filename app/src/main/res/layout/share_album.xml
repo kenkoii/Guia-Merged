@@ -59,6 +59,7 @@
 
 
             <com.facebook.share.widget.ShareButton
+                android:id="@+id/share_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

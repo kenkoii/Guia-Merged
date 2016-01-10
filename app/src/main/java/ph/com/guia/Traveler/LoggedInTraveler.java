@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,8 @@ public class LoggedInTraveler extends AppCompatActivity
     public static boolean addedFrag = false;
     public static Toolbar mToolbar;
     public static ImageView nav_image;
+    public static LinearLayout nav_cover;
+    DrawerLayout drawer;
     TextView nav_name, nav_info;
     ActionBarDrawerToggle mToggle;
 
@@ -89,7 +92,7 @@ public class LoggedInTraveler extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         mToggle = new ActionBarDrawerToggle(
                 this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -106,12 +109,23 @@ public class LoggedInTraveler extends AppCompatActivity
 
     public void setUpHeader(){
         nav_image = (ImageView) findViewById(R.id.nav_image);
+        nav_cover = (LinearLayout) findViewById(R.id.nav_cover);
         nav_name = (TextView) findViewById(R.id.nav_name);
         nav_info = (TextView) findViewById(R.id.nav_info);
 
         JSONParser.getInstance(this).getImageUrl(image, "LoggedInTraveler", 0);
         nav_name.setText(name);
         nav_info.setText(gender.substring(0,1).toUpperCase()+gender.substring(1)+", "+age);
+
+        nav_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TravelerProfileFragment tpf = new TravelerProfileFragment();
+                ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.drawer_fragment_container, tpf).commit();
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
     }
 
     @Override
