@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import ph.com.guia.Helper.ImageLoadTask;
 import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.Helper.RVadapter;
+import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
 import ph.com.guia.Model.Tours;
 import ph.com.guia.Model.review;
@@ -29,6 +31,7 @@ import ph.com.guia.R;
 
 public class GuideProfileFragment extends Fragment {
 
+    public static LinearLayout guide_profile_cover;
     public static ImageView profImage;
     public static ArrayList<review> mList = new ArrayList<review>();
     public static RecyclerView rv;
@@ -43,8 +46,10 @@ public class GuideProfileFragment extends Fragment {
         setHasOptionsMenu(true);
         LoggedInGuide.mToolbar.setTitle("Profile");
 
+        mList.clear();
         rating = getArguments().getDouble("rating");
         type = getArguments().getString("type");
+
     }
 
     @Override
@@ -64,8 +69,9 @@ public class GuideProfileFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 
-        JSONParser.getInstance(getActivity().getApplicationContext()).getReviewsByGuideId(Constants.getReviewsByGuideId+LoggedInGuide.guide_id);
+        JSONParser.getInstance(getActivity().getApplicationContext()).getReviewsByGuideId(Constants.getReviewsByGuideId + LoggedInGuide.guide_id);
 
+        guide_profile_cover = (LinearLayout) view.findViewById(R.id.guide_profile_cover);
         profImage = (ImageView) view.findViewById(R.id.main_profile_image);
         TextView profName = (TextView) view.findViewById(R.id.main_profile_name);
         TextView profEmail = (TextView) view.findViewById(R.id.main_profile_email);
@@ -77,6 +83,7 @@ public class GuideProfileFragment extends Fragment {
 
 
         JSONParser parser = new JSONParser(getActivity().getApplicationContext());
+        parser.getImageUrl(MainActivity.cover, "GuideProfileCover", 0);
         parser.getImageUrl(LoggedInGuide.image, "GuideProfile", 0);
 
         profName.setText(LoggedInGuide.name);

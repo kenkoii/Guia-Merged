@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 import org.json.JSONArray;
@@ -35,6 +36,7 @@ public class GuideAddInfoFragment extends Fragment {
     FragmentTransaction ft;
     public static String[] location_list;
     public static ArrayAdapter<String> adapter;
+    public static LinearLayout linearLayout;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
@@ -45,9 +47,11 @@ public class GuideAddInfoFragment extends Fragment {
         txtEmail = (EditText) view.findViewById(R.id.txtEmail);
         btnNext = (Button) view.findViewById(R.id.guide1_next);
         btnBack = (Button) view.findViewById(R.id.guide1_back);
+        linearLayout = (LinearLayout) view.findViewById(R.id.preferences_holder);
 
         JSONParser parser = new JSONParser(getActivity().getApplicationContext());
         parser.getAllLocations(Constants.getAllLocations, "GuideAddInfoFragment");
+        parser.getPreferences(Constants.getPreferences, "GuideAddInfo");
 
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override

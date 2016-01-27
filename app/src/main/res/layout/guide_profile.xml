@@ -4,71 +4,91 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
     android:gravity="center_vertical">
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/main_profile_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/default_profile"
-            app:border_width="2dp"
-            app:border_color="#61E24C"/>
-
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/guide_profile_cover"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:paddingLeft="5dp">
-
-            <RatingBar
-                android:id="@+id/rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:numStars="5"
-                android:stepSize="0.1"
-                android:isIndicator="true"
-                style="?android:attr/ratingBarStyleIndicator"/>
-
-            <TextView
-                android:id="@+id/main_profile_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Full Name Here"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/main_profile_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Email Here"
-                android:textStyle="italic"/>
-
-            <TextView
-                android:id="@+id/main_profile_age"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Age Here"
-                android:textStyle="italic"/>
+            android:layout_height="177dp"
+            android:background="@drawable/background"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:paddingBottom="2dp">
         </LinearLayout>
-    </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="135dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/main_profile_image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/default_profile"
+                app:border_width="2dp"
+                app:border_color="#61E24C"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="15dp">
+
+                <RatingBar
+                    android:id="@+id/rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="0.1"
+                    android:isIndicator="true"
+                    style="?android:attr/ratingBarStyleIndicator"
+                    android:layout_marginLeft="-5dp"/>
+
+                <TextView
+                    android:id="@+id/main_profile_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Full Name Here"
+                    android:layout_marginTop="5dp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/main_profile_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Email Here"
+                    android:textStyle="italic"/>
+
+                <TextView
+                    android:id="@+id/main_profile_age"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Age Here"
+                    android:textStyle="italic"/>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="10dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -88,7 +108,10 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="10dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -108,7 +131,10 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="10dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -135,5 +161,6 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/guide_prof_review_rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:padding="10dp"/>
 </LinearLayout>

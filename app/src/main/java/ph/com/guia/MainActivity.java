@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     public static LoginButton loginButton;
     public static boolean end = false;
     public static LoginManager manager;
-    public static String fb_id, image, name, bday, gender, age;
+    public static String fb_id, image, name, bday, gender, age, cover, user_id;
+    public static double points;
     public static ProgressDialog pd;
     DBHelper db = new DBHelper(this);
 
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
                             //if(user==null) {
                             fb_id = object.getString("id");
+                            cover = object.getJSONObject("cover").getString("source");
                             JSONObject pic = object.getJSONObject("picture");
                             JSONObject data = pic.getJSONObject("data");
                             //Toast.makeText(MainActivity.this, "awa ari nisud", Toast.LENGTH_LONG).show();
@@ -122,11 +124,11 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         pd.dismiss();
-                        MainActivity.this.finish();
+                        //MainActivity.this.finish();
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,picture,name,birthday,gender,age_range");
+        parameters.putString("fields", "id,picture,name,birthday,gender,age_range,cover");
         request.setParameters(parameters);
         request.executeAsync();
     }
