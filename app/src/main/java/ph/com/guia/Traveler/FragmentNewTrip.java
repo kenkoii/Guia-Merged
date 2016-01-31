@@ -87,7 +87,14 @@ public class FragmentNewTrip extends Fragment implements View.OnClickListener, D
                 else if(end.equalsIgnoreCase("Pick date")) Toast.makeText(getActivity().getApplicationContext(),
                         "Please pick ending date", Toast.LENGTH_SHORT).show();
                 else{
-                    FragmentTripBooking ftb = new FragmentTripBooking(location, start, end);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("location", location);
+                    bundle.putString("start", start);
+                    bundle.putString("end", end);
+
+                    FragmentTripBooking ftb = new FragmentTripBooking();
+                    ftb.setArguments(bundle);
+
                     FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                     ft.replace(R.id.drawer_fragment_container, ftb).addToBackStack(null).commit();
                 }

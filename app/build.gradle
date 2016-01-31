@@ -34,4 +34,5 @@ dependencies {
     compile 'com.cloudinary:cloudinary-android:1.2.2'
     compile 'com.wdullaer:materialdatetimepicker:2.1.1'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
+    compile 'com.paypal.sdk:paypal-android-sdk:2.13.1'
 }

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,20 +29,23 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
+import ph.com.guia.Helper.ConnectionChecker;
 import ph.com.guia.Helper.DBHelper;
 import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.Model.Constants;
+import ph.com.guia.Navigation.NoConnectionFragment;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    CallbackManager callbackManager;
     public static LoginButton loginButton;
     public static boolean end = false;
     public static LoginManager manager;
     public static String fb_id, image, name, bday, gender, age, cover, user_id;
     public static double points;
     public static ProgressDialog pd;
+    public static FragmentManager fm;
+    CallbackManager callbackManager;
     DBHelper db = new DBHelper(this);
 
     @Override
@@ -49,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_main);
+
+        fm = getSupportFragmentManager();
+        manager = LoginManager.getInstance();
 
         Cursor c = db.getFilter();
         if(!c.moveToFirst()) db.defaultFilter();
@@ -85,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
                         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                         StrictMode.setThreadPolicy(policy);
 
-                        manager = LoginManager.getInstance();
                         //Toast.makeText(MainActivity.this, "JSON: "+object, Toast.LENGTH_LONG).show();
                         try {
 
@@ -169,9 +176,9 @@ public class MainActivity extends AppCompatActivity {
             this.finish();
         }
         else if(AccessToken.getCurrentAccessToken()!=null){
-            requestData(AccessToken.getCurrentAccessToken());
+            if(new ConnectionChecker(this).isConnectedToInternet()) requestData(AccessToken.getCurrentAccessToken());
+            else Toast.makeText(this, "No Internet Connection!", Toast.LENGTH_SHORT).show();
         }
-        else{}
 
         AppEventsLogger.activateApp(this);
     }

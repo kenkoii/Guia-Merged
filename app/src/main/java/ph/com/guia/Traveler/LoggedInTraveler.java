@@ -24,12 +24,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ph.com.guia.Guide.GuideCalendarFragment;
+import ph.com.guia.Helper.ConnectionChecker;
 import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
 import ph.com.guia.Navigation.FilterFragment;
 import ph.com.guia.Navigation.HomeFragment;
 import ph.com.guia.Navigation.MessageFragment;
+import ph.com.guia.Navigation.NoConnectionFragment;
 import ph.com.guia.Navigation.PreviousFragment;
 import ph.com.guia.Navigation.SettingFragment;
 import ph.com.guia.Navigation.TripFragment;
@@ -44,12 +46,12 @@ public class LoggedInTraveler extends AppCompatActivity
     public static Toolbar mToolbar;
     public static ImageView nav_image;
     public static LinearLayout nav_cover;
+    public static FragmentTransaction ft;
     DrawerLayout drawer;
     TextView nav_name, nav_info;
     ActionBarDrawerToggle mToggle;
 
     public static String name, bday, gender, age, image, fb_id, user_id;
-    FragmentTransaction ft;
     HomeFragment hf = new HomeFragment();
     SettingFragment sf = new SettingFragment();
     MessageFragment mf = new MessageFragment();
@@ -137,6 +139,20 @@ public class LoggedInTraveler extends AppCompatActivity
             return true;
         }
 
+        if(addedFrag) fm.popBackStackImmediate();
+
+        if(!new ConnectionChecker(this).isConnectedToInternet()){
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", id);
+
+            NoConnectionFragment ncf = new NoConnectionFragment();
+            ncf.setArguments(bundle);
+
+            ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.drawer_fragment_container, ncf).commit();
+            return true;
+        }
+
         switch (id){
             case R.id.filter:
                 mToolbar.setTitle("Filter");
@@ -171,6 +187,18 @@ public class LoggedInTraveler extends AppCompatActivity
         doubleBackToExitPressedOnce = false;
 
         int id = item.getItemId();
+
+        if(!new ConnectionChecker(this).isConnectedToInternet()){
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", id);
+
+            NoConnectionFragment ncf = new NoConnectionFragment();
+            ncf.setArguments(bundle);
+
+            ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.drawer_fragment_container, ncf).commit();
+            return true;
+        }
 
         switch(id){
             case R.id.nav_home:

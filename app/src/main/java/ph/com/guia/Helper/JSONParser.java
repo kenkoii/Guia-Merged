@@ -1,7 +1,9 @@
 package ph.com.guia.Helper;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -15,6 +17,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -39,9 +42,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.logging.Filter;
+
 import ph.com.guia.Guide.GuideAddInfoFragment;
 import ph.com.guia.Guide.GuideProfileFragment;
 import ph.com.guia.Guide.LoggedInGuide;
+import ph.com.guia.Navigation.FilterFragment;
+import ph.com.guia.Navigation.NoConnectionFragment;
 import ph.com.guia.Traveler.TravelerProfileFragment;
 import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
@@ -63,7 +70,7 @@ import ph.com.guia.Traveler.LoggedInTraveler;
 public class JSONParser {
 
     private static JSONParser parser;
-    Context context;
+    static Context context;
     RequestQueue mRequestQueue;
     private ImageLoader imageLoader;
     public static int size=0;
@@ -90,6 +97,7 @@ public class JSONParser {
     }
 
     public static synchronized JSONParser getInstance(Context context) {
+        JSONParser.context = context;
         if (parser == null) {
             parser = new JSONParser(context);
         }
@@ -110,7 +118,7 @@ public class JSONParser {
         return mRequestQueue;
     }
 
-    public void acceptBooking(JSONObject request, String url){
+    public void acceptBooking(final JSONObject request, final String url){
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -124,12 +132,24 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("ACCEPTBOOKING", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    acceptBooking(request, url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", R.id.nav_tours);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                    LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                }
             }
         });
         mRequestQueue.add(jsonObjectRequest);
     }
 
-    public void requestBooking(JSONObject request, String url){
+    public void requestBooking(final JSONObject request, final String url){
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -139,13 +159,25 @@ public class JSONParser {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                VolleyLog.e("ACCEPTBOOKING", error.getMessage());
+                VolleyLog.e("REQUESTBOOKING", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    requestBooking(request, url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", 0);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                    LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                }
             }
         });
         mRequestQueue.add(jsonObjectRequest);
     }
 
-    public void getBookingsById(JSONObject request, String url, final String activity){
+    public void getBookingsById(final JSONObject request, final String url, final String activity){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, url, request,
                 new Response.Listener<JSONArray>() {
                     @Override
@@ -238,12 +270,29 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETBOOKINGSBYID", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    getBookingsById(request, url, activity);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", R.id.nav_tours);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    if(context instanceof LoggedInGuide) {
+                        LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                    }else if(context instanceof LoggedInTraveler){
+                        LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                        LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                    }
+                }
             }
         });
         mRequestQueue.add(jsonArrayRequest);
     }
 
-    public void addTour(JSONObject request, String url){
+    public void addTour(final JSONObject request, final String url){
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -254,12 +303,29 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("ADDTOUR", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    addTour(request, url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", 0);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    if(context instanceof LoggedInGuide) {
+                        LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                    }else if(context instanceof LoggedInTraveler){
+                        LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                        LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                    }
+                }
             }
         });
        mRequestQueue.add(jsonObjectRequest);
     }
 
-    public void getAllTours(String url){
+    public void getAllTours(final String url){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, "",
                 new Response.Listener<JSONArray>() {
                     @Override
@@ -276,21 +342,23 @@ public class JSONParser {
                         for(int i = 0; i < response.length(); i++){
                             try {
                                 JSONObject obj = response.getJSONObject(i);
-
-                                tour_id = obj.getString("_id");
-                                tour_name = obj.getString("name");
-                                tour_location = obj.getString("tour_location");
-                                tour_duration = obj.getInt("duration");
-                                duration_format = obj.getString("duration_format");
-                                tour_description = obj.getString("details");
-                                tour_preference = obj.getString("tour_preference");
                                 tour_guideId = obj.getString("tour_guide_id");
-                                tour_rate = obj.getInt("rate");
-                                main_image = obj.getString("main_image");
-                                points = obj.getInt("points");
 
-                                HomeFragment.mList.add(new Tours(tour_id, tour_name, tour_location, tour_description, duration_format,
-                                        tour_preference, tour_guideId, tour_rate, main_image, tour_duration, null, points,"HomeFragment"));
+                                if(!tour_guideId.equalsIgnoreCase("deactivated")) {
+                                    tour_id = obj.getString("_id");
+                                    tour_name = obj.getString("name");
+                                    tour_location = obj.getString("tour_location");
+                                    tour_duration = obj.getInt("duration");
+                                    duration_format = obj.getString("duration_format");
+                                    tour_description = obj.getString("details");
+                                    tour_preference = obj.getString("tour_preference");
+                                    tour_rate = obj.getInt("rate");
+                                    main_image = obj.getString("main_image");
+                                    points = obj.getInt("points");
+
+                                    HomeFragment.mList.add(new Tours(tour_id, tour_name, tour_location, tour_description, duration_format,
+                                            tour_preference, tour_guideId, tour_rate, main_image, tour_duration, null, points, "HomeFragment"));
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -312,12 +380,29 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETALLTOURS", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    getAllTours(url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", R.id.nav_home);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    if(context instanceof LoggedInGuide) {
+                        LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                    }else if(context instanceof LoggedInTraveler){
+                        LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                        LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                    }
+                }
             }
         });
         mRequestQueue.add(jsonArrayRequest);
     }
 
-    public void getAllToursByPreference(JSONObject jsonObject, String url){
+    public void getAllToursByPreference(final JSONObject jsonObject, final String url){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, url, jsonObject,
                 new Response.Listener<JSONArray>() {
                     @Override
@@ -360,7 +445,9 @@ public class JSONParser {
                                     }
                                 }
 
-                                if(ok) {
+                                tour_guideId = obj.getString("tour_guide_id");
+
+                                if(ok && !tour_guideId.equalsIgnoreCase("deactivated")) {
                                     tour_id = obj.getString("_id");
                                     tour_name = obj.getString("name");
                                     tour_location = obj.getString("tour_location");
@@ -368,7 +455,6 @@ public class JSONParser {
                                     duration_format = obj.getString("duration_format");
                                     tour_description = obj.getString("details");
                                     tour_preference = obj.getString("tour_preference");
-                                    tour_guideId = obj.getString("tour_guide_id");
                                     tour_rate = obj.getInt("rate");
                                     main_image = obj.getString("main_image");
                                     points = obj.getInt("points");
@@ -398,6 +484,23 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETALLTOURSBYPREFERENCE", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    getAllToursByPreference(jsonObject, url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", R.id.add_trip);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    if(context instanceof LoggedInGuide) {
+                        LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                    }else if(context instanceof LoggedInTraveler){
+                        LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                        LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                    }
+                }
             }
         });
         mRequestQueue.add(jsonArrayRequest);
@@ -451,7 +554,7 @@ public class JSONParser {
        mRequestQueue.add(jsonObjectRequest);
     }
 
-    public void getUserById(String url, final String tour_name, final String booking_id, final String date){
+    public void getUserById(final String url, final String tour_name, final String booking_id, final String date){
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, "",
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -478,12 +581,29 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETUSERBYID", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    getUserById(url, tour_name, booking_id, date);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", R.id.nav_home);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    if(context instanceof LoggedInGuide) {
+                        LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                    }else if(context instanceof LoggedInTraveler){
+                        LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                        LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).commit();
+                    }
+                }
             }
         });
        mRequestQueue.add(jsonObjectRequest);
     }
 
-    public void postLogin(JSONObject request, String url){
+    public void postLogin(final JSONObject request, final String url){
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -545,7 +665,46 @@ public class JSONParser {
                                         context.startActivity(intent);
                                     }
                                     else{
-                                        getGuideById(Constants.getGuideById+guide_id, guide_id, "MainActivity");
+                                        if(!guide_id.equalsIgnoreCase("deactivated")){
+                                            if(!guide_id.equalsIgnoreCase("pending")){
+                                                getGuideById(Constants.getGuideById + guide_id, guide_id, "MainActivity");
+                                            }else {
+                                                Intent intent = new Intent(context, LoggedInGuide.class);
+                                                intent.putExtra("fb_id", MainActivity.fb_id);
+                                                intent.putExtra("name", MainActivity.name);
+                                                intent.putExtra("bday", MainActivity.bday);
+                                                intent.putExtra("gender", MainActivity.gender);
+                                                intent.putExtra("age", MainActivity.age);
+                                                intent.putExtra("image", MainActivity.image);
+                                                intent.putExtra("location", "Pending Data");
+                                                intent.putExtra("contact", "Pending Data");
+                                                intent.putExtra("email", "Pending Data");
+                                                intent.putExtra("type", "Pending Data");
+                                                intent.putExtra("guide_id", guide_id);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                context.startActivity(intent);
+                                            }
+                                        }else{
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                            builder.setIcon(R.drawable.ic_launcher);
+                                            builder.setTitle("Notice");
+                                            builder.setMessage("\nYou have been deactivated as guide.\nProceed as Traveler?\n");
+                                            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    MainActivity.manager.logOut();
+                                                }
+                                            });
+                                            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    DBHelper db = new DBHelper(context);
+                                                    db.updSetting(MainActivity.fb_id, 1, "isTraveler");
+                                                    postLogin(request, url);
+                                                }
+                                            });
+                                            builder.show();
+                                        }
                                     }
                                 }
                             }
@@ -593,19 +752,18 @@ public class JSONParser {
        mRequestQueue.add(jsonObjectRequest);
     }
 
-    public void getGuideById(String url, final String guide_id, final String activity){
+    public void getGuideById(final String url, final String guide_id, final String activity){
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, "",
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        String contact = null;
-                        String email = null;
-                        String location = null;
+                        String contact = null, email = null, location = null, type = null;
                         try {
                             contact = response.getString("contact_number");
                             email = response.getString("email_address");
                             location = response.getString("city")+", "+
                                     response.getString("country");
+                            type = response.getString("type");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -621,6 +779,7 @@ public class JSONParser {
                             intent.putExtra("location", location);
                             intent.putExtra("contact", contact);
                             intent.putExtra("email", email);
+                            intent.putExtra("type", type);
                             intent.putExtra("guide_id", guide_id);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(intent);
@@ -637,6 +796,7 @@ public class JSONParser {
                             intent.putExtra("location", location);
                             intent.putExtra("contact", contact);
                             intent.putExtra("email", email);
+                            intent.putExtra("type", type);
                             intent.putExtra("guide_id", RegisterActivity.guide_id);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(intent);
@@ -660,12 +820,31 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETGUIDEBYID", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    getGuideById(url, guide_id, activity);
+                }else{
+                    Bundle bundle = new Bundle();
+
+                    if(activity.equalsIgnoreCase("GuideProfile")) bundle.putInt("id", 1);
+                    else bundle.putInt("id", 0);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    if(context instanceof LoggedInGuide) {
+                        LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                    }else if(context instanceof LoggedInTraveler){
+                        LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                        LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                    }
+                }
             }
         });
        mRequestQueue.add(jsonObjectRequest);
     }
 
-    public void getAllLocations(String url, final String activity){
+    public void getAllLocations(final String url, final String activity){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, "",
                 new Response.Listener<JSONArray>() {
                     @Override
@@ -704,6 +883,7 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETALLLOCATION", error.getMessage());
+                getAllLocations(url, activity);
             }
         });
        mRequestQueue.add(jsonArrayRequest);
@@ -762,12 +942,11 @@ public class JSONParser {
        mRequestQueue.add(imageRequest);
     }
 
-    public void getReviewsByGuideId(String url){
+    public void getReviewsByGuideId(final String url){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, "",
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        size = 0;
                         for(int i = 0; i < response.length(); i++){
                             try {
                                 JSONObject req = response.getJSONObject(i);
@@ -793,6 +972,23 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETREVIEWBYGUIDEID", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    getReviewsByGuideId(url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", 1);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    if(context instanceof LoggedInGuide) {
+                        LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                    }else if(context instanceof LoggedInTraveler){
+                        LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                        LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                    }
+                }
             }
         });
         mRequestQueue.add(jsonArrayRequest);
@@ -843,14 +1039,14 @@ public class JSONParser {
         mRequestQueue.add(jsonObjectRequest);
     }
 
-    public void getPreferences(String url, final String activity){
+    public void getPreferences(final String url, final String activity){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, "",
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
                         if(activity.equalsIgnoreCase("GuideAddInfo")) {
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.WRAP_CONTENT);
                             LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(0,
                                     ViewGroup.LayoutParams.WRAP_CONTENT);
                             params2.weight = 1;
@@ -865,6 +1061,8 @@ public class JSONParser {
                                         cb.setText(response.getJSONObject(i).getString("preference"));
                                         cb.setTextColor(Color.BLACK);
                                         cb.setLayoutParams(params2);
+
+                                        GuideAddInfoFragment.cbs.add(cb);
 
                                         ll.addView(cb);
                                         count++;
@@ -884,12 +1082,68 @@ public class JSONParser {
                                     e.printStackTrace();
                                 }
                             }
+                        }else if(activity.equalsIgnoreCase("TravelerFilter")){
+                            String updInt="";
+                            for (int i = 0; i < response.length(); i++) {
+                                try {
+                                    if (response.getJSONObject(i).getBoolean("isActivated")) {
+                                        CheckBox cb = new CheckBox(context);
+                                        cb.setId(i + 1);
+                                        cb.setText(response.getJSONObject(i).getString("preference"));
+                                        cb.setTextColor(Color.BLACK);
+                                        cb.setLayoutParams(params);
+
+                                        updInt += cb.getText().toString()+"/";
+                                        FilterFragment.linearLayout.addView(cb);
+                                        FilterFragment.cbs.add(cb);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                if(i == response.length()-1){
+                                    final DBHelper db = new DBHelper(context);
+                                    Cursor c = db.getFilter();
+                                    if(c.moveToFirst()){
+                                        String interest = c.getString(c.getColumnIndex("interest"));
+                                        if(interest.equals("13")){
+                                            db.updFilterInterest(updInt);
+                                        }
+
+                                        FilterFragment.pd.dismiss();
+                                        for(int j = 0; j<FilterFragment.cbs.size(); j++){
+                                            Cursor cur = db.getFilter();
+                                            if(cur.moveToFirst()) interest = cur.getString(cur.getColumnIndex("interest"));
+                                            cur.close();
+
+                                            if(interest.contains(FilterFragment.cbs.get(j).getText().toString())){
+                                                FilterFragment.cbs.get(j).setChecked(true);
+
+                                                FilterFragment.cbs.get(j).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                    @Override
+                                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                        String updInt = "";
+                                                        for(int k = 0; k < FilterFragment.cbs.size(); k++){
+                                                            if(FilterFragment.cbs.get(k).isChecked()){
+                                                                updInt += FilterFragment.cbs.get(k).getText().toString()+"/";
+                                                            }
+
+                                                            if(k == FilterFragment.cbs.size()-1) db.updFilterInterest(updInt);
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETPREFERENCES", error.getMessage());
+                getPreferences(url, activity);
             }
         });
         mRequestQueue.add(jsonArrayRequest);

@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -96,6 +97,7 @@ public class GuideProfileFragment extends Fragment {
         rb.setNumStars(5);
         rb.setRating((float)rating);
 
+        Log.w("qweqwe", String.valueOf(rating)+" "+String.valueOf((float) rating));
         return view;
     }
 
