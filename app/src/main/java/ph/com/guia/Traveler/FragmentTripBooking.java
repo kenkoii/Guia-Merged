@@ -37,16 +37,14 @@ public class FragmentTripBooking extends Fragment {
     public static ProgressDialog pd;
     public static ArrayList<Tours> mList = new ArrayList<Tours>();
 
-    public FragmentTripBooking(String location, String start, String end) {
-        this.location = location;
-        this.start = start;
-        this.end = end;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        location = getArguments().getString("location");
+        start = getArguments().getString("start");
+        end = getArguments().getString("end");
 
         mList.clear();
         pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, false);
@@ -79,7 +77,10 @@ public class FragmentTripBooking extends Fragment {
 
     public static void onCardClick(Tours tour){
         LoggedInTraveler.addedFrag = true;
-        FragmentBookingRequest fbr = new FragmentBookingRequest(tour);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("tour", tour);
+        FragmentBookingRequest fbr = new FragmentBookingRequest();
+        fbr.setArguments(bundle);
         FragmentTransaction ft = LoggedInTraveler.fm.beginTransaction();
         ft.replace(R.id.drawer_fragment_container, fbr).addToBackStack(null).commit();
     }

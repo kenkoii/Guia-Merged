@@ -90,7 +90,10 @@ public class HomeFragment extends Fragment {
 
     public static void onCardClick(Tours tour){
         LoggedInTraveler.addedFrag = true;
-        FragmentBookingRequest fbr = new FragmentBookingRequest(tour);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("tour", tour);
+        FragmentBookingRequest fbr = new FragmentBookingRequest();
+        fbr.setArguments(bundle);
         FragmentTransaction ft = LoggedInTraveler.fm.beginTransaction();
         ft.replace(R.id.drawer_fragment_container, fbr).addToBackStack(null).commit();
     }

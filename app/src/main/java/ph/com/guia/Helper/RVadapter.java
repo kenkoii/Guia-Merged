@@ -134,9 +134,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
             params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
             iv.setLayoutParams(params);
 
-            try {
-                LoggedInGuide.mToolbar.setTitle("Popular Destination");
-
+            if(LoggedInGuide.mToolbar != null){
                 if(tours.get(position).activity.equalsIgnoreCase("UpcomingFragment")){
                     StringTokenizer st = new StringTokenizer(tours.get(index).duration_format,"/");
                     int month = Integer.parseInt(st.nextToken());
@@ -185,9 +183,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                         }
                     });
                 }
-            }catch (Exception e) {
-                LoggedInTraveler.mToolbar.setTitle("Popular Destination");
-
+            }else{
                 if(tours.get(index).activity.equalsIgnoreCase("UpcomingTraveler")){
                     if(tours.get(index).tour_id.equalsIgnoreCase("completed")){
                         if(position < holder.due.size()) {

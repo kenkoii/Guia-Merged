@@ -15,18 +15,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.android.Utils;
 import com.cloudinary.utils.ObjectUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import ph.com.guia.Helper.ConnectionChecker;
@@ -42,9 +46,11 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
     Switch negotiable;
     Button btnNext;
     LayoutInflater inflater;
-    Uri[] imageUri;
-    Uri main_imageUri;
-    int count = 0;
+    LinearLayout linearLayout;
+    ArrayList<String> photos = new ArrayList<String>();
+    Uri imageUri;
+    int id = 0;
+
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,6 +64,8 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
         title = (EditText) view.findViewById(R.id.itinerary_title);
         description = (EditText) view.findViewById(R.id.itinerary_desc);
         btnNext = (Button) view.findViewById(R.id.itinerary_btnNext);
+        linearLayout = (LinearLayout) view.findViewById(R.id.image_holder);
+        duration_format = (Spinner) view.findViewById(R.id.duration_format);
 
         main_image.setOnClickListener(this);
         add_image.setOnClickListener(this);
@@ -98,21 +106,26 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
                     if(new ConnectionChecker(getActivity().getApplicationContext()).isConnectedToInternet()){
                         Cloudinary cloudinary = new Cloudinary(Utils.cloudinaryUrlFromContext(getActivity().getApplicationContext()));
                         try{
-                            File file = new File(getRealPathFromURI(main_imageUri));
+                            File file = new File(getRealPathFromURI(imageUri));
                             Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
                             String image = uploadResult.get("url").toString();
-                            Log.e("image", image);
+
+                            JSONArray images = new JSONArray();
+                            for(int i = 0; i < photos.size(); i++){
+                                images.put(photos.get(i));
+                            }
 
                             JSONObject request = new JSONObject();
                             request.accumulate("name", title.getText().toString());
                             request.accumulate("duration", duration.getText().toString());
-                            request.accumulate("duration_format", "hours");
+                            request.accumulate("duration_format", duration_format.getSelectedItem().toString());
                             request.accumulate("details", description.getText().toString());
-                            request.accumulate("tour_preference", "Arts");
-                            request.accumulate("tour_location", "Cebu, Philippines");
+                            request.accumulate("tour_preference", LoggedInGuide.type);
+                            request.accumulate("tour_location", LoggedInGuide.location);
                             request.accumulate("tour_guide_id", LoggedInGuide.guide_id);
                             request.accumulate("rate", price.getText().toString());
                             request.accumulate("main_image", image);
+                            request.accumulate("additional_image", images);
 
                             JSONParser parser = new JSONParser(getActivity().getApplicationContext());
                             parser.addTour(request, Constants.addTour);
@@ -122,8 +135,11 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
+                        alertDialog.dismiss();
+                    }else{
+                        Toast.makeText(getContext(), "No Internet Connection! Please try again!", Toast.LENGTH_SHORT).show();
                     }
-                    alertDialog.dismiss();
                 }
             }
         });
@@ -135,14 +151,45 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        imageUri = data.getData();
+
         switch (requestCode) {
             case 1:
-                main_imageUri = data.getData();
-                main_image.setImageURI(main_imageUri);
+                main_image.setImageURI(imageUri);
                 //ImageResizer ir = new ImageResizer(getActivity().getApplicationContext());
                 //ir.scaleImage(main_image, 425, 150);
                 break;
             case 2:
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 80);
+                params.setMargins(5, 10, 5, 10);
+                ImageView iv = new ImageView(getActivity().getApplicationContext());
+                iv.setId(id++);
+                iv.setImageURI(imageUri);
+                iv.setLayoutParams(params);
+                iv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        intent.setFlags(id - 1);
+                        startActivityForResult(intent, 3);
+                    }
+                });
+                linearLayout.addView(iv);
+
+                try {
+                    if (new ConnectionChecker(getActivity().getApplicationContext()).isConnectedToInternet()) {
+                        Cloudinary cloudinary = new Cloudinary(Utils.cloudinaryUrlFromContext(getActivity().getApplicationContext()));
+                        File file = new File(getRealPathFromURI(imageUri));
+                        Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+                        photos.add(uploadResult.get("url").toString());
+                    }
+                }catch(IOException e){}
+
+                break;
+            case 3:
+                int position = data.getFlags();
+                ((ImageView) linearLayout.findViewById(position)).setImageURI(imageUri);
+                break;
         }
     }
 

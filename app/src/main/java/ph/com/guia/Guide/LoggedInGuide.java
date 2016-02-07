@@ -1,5 +1,7 @@
 package ph.com.guia.Guide;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -18,17 +20,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
 import com.facebook.share.model.SharePhoto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import ph.com.guia.Helper.ConnectionChecker;
 import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
 import ph.com.guia.Navigation.FilterFragment;
 import ph.com.guia.Navigation.HomeFragment;
 import ph.com.guia.Navigation.MessageFragment;
+import ph.com.guia.Navigation.NoConnectionFragment;
 import ph.com.guia.Navigation.SettingFragment;
 import ph.com.guia.Navigation.ShareFragment;
 import ph.com.guia.Navigation.TripFragment;
@@ -38,7 +43,7 @@ public class LoggedInGuide extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static boolean doubleBackToExitPressedOnce = false;
-    static boolean addedFrag = false;
+    public static boolean addedFrag = false;
     public static Toolbar mToolbar;
     public static ImageView nav_image;
     public static LinearLayout nav_cover;
@@ -50,7 +55,8 @@ public class LoggedInGuide extends AppCompatActivity
     ActionBarDrawerToggle mToggle;
 
 
-    public static String name, bday, gender, age, image, location, contact, email, guide_id, fb_id;
+    public static String name, bday, gender, age, image, location, contact,
+            email, guide_id, fb_id, type;
     public static FragmentTransaction ft;
     HomeFragment hf = new HomeFragment();
     SettingFragment sf = new SettingFragment();
@@ -64,6 +70,7 @@ public class LoggedInGuide extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //FacebookSdk.sdkInitialize(this);
         setContentView(R.layout.drawer_layout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -83,6 +90,7 @@ public class LoggedInGuide extends AppCompatActivity
             contact = b.getString("contact");
             email = b.getString("email");
             guide_id = b.getString("guide_id");
+            type = b.getString("type");
         }
         catch(Exception e){}
 
@@ -127,8 +135,17 @@ public class LoggedInGuide extends AppCompatActivity
             public void onClick(View v) {
 //                ft = getSupportFragmentManager().beginTransaction();
 //                ft.replace(R.id.drawer_fragment_container, gpf).commit();
-                JSONParser.getInstance(LoggedInGuide.this).getGuideById(Constants.getGuideById+guide_id, guide_id, "GuideProfile");
-                drawer.closeDrawer(GravityCompat.START);
+                if(!guide_id.equalsIgnoreCase("pending")) {
+                    JSONParser.getInstance(LoggedInGuide.this).getGuideById(Constants.getGuideById + guide_id, guide_id, "GuideProfile");
+                    drawer.closeDrawer(GravityCompat.START);
+                }else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoggedInGuide.this);
+                    builder.setIcon(R.drawable.ic_launcher);
+                    builder.setTitle("Notice");
+                    builder.setMessage("\nGuide Request Still Pending!\n");
+                    builder.setPositiveButton("OK", null);
+                    builder.show();
+                }
             }
         });
     }
@@ -142,6 +159,18 @@ public class LoggedInGuide extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+
+        if(!new ConnectionChecker(this).isConnectedToInternet()){
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", id);
+
+            NoConnectionFragment ncf = new NoConnectionFragment();
+            ncf.setArguments(bundle);
+
+            ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.drawer_fragment_container, ncf).commit();
             return true;
         }
 
@@ -162,7 +191,7 @@ public class LoggedInGuide extends AppCompatActivity
                 mToolbar.setTitle("Create Tour");
                 addedFrag = true;
                 ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.drawer_fragment_container, aif).addToBackStack(null).commit();
+                ft.add(R.id.drawer_fragment_container, aif).addToBackStack(null).commit();
                 break;
             case R.id.done:
                 addedFrag = false;
@@ -181,15 +210,37 @@ public class LoggedInGuide extends AppCompatActivity
 
         int id = item.getItemId();
 
+        if(!new ConnectionChecker(this).isConnectedToInternet()){
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", id);
+
+            NoConnectionFragment ncf = new NoConnectionFragment();
+            ncf.setArguments(bundle);
+
+            ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.drawer_fragment_container, ncf).commit();
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        }
+
         switch(id){
             case R.id.nav_home:
                 ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.drawer_fragment_container, hf).commit();
                 break;
             case R.id.nav_tours:
-                ft = getSupportFragmentManager().beginTransaction();
-                TripFragment tf = new TripFragment();
-                ft.replace(R.id.drawer_fragment_container, tf).commit();
+                if(!guide_id.equalsIgnoreCase("pending")) {
+                    ft = getSupportFragmentManager().beginTransaction();
+                    TripFragment tf = new TripFragment();
+                    ft.replace(R.id.drawer_fragment_container, tf).commit();
+                }else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoggedInGuide.this);
+                    builder.setIcon(R.drawable.ic_launcher);
+                    builder.setTitle("Notice");
+                    builder.setMessage("\nGuide Request Still Pending!\n");
+                    builder.setPositiveButton("OK", null);
+                    builder.show();
+                }
                 break;
             case R.id.nav_messages:
                 ft = getSupportFragmentManager().beginTransaction();

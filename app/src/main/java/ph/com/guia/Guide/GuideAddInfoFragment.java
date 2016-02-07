@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -20,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import ph.com.guia.Helper.DBHelper;
 import ph.com.guia.Helper.JSONParser;
@@ -29,14 +31,16 @@ import ph.com.guia.R;
 import ph.com.guia.RegisterActivity;
 
 public class GuideAddInfoFragment extends Fragment {
-    EditText txtContact, txtEmail;
     public static Spinner spnrLocation;
-    Button btnNext, btnBack;
     public static String location, contact, email;
-    FragmentTransaction ft;
     public static String[] location_list;
     public static ArrayAdapter<String> adapter;
     public static LinearLayout linearLayout;
+    public static ArrayList<CheckBox> cbs = new ArrayList<CheckBox>();
+    EditText txtContact, txtEmail;
+    Button btnNext, btnBack;
+    FragmentTransaction ft;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
@@ -49,6 +53,7 @@ public class GuideAddInfoFragment extends Fragment {
         btnBack = (Button) view.findViewById(R.id.guide1_back);
         linearLayout = (LinearLayout) view.findViewById(R.id.preferences_holder);
 
+        cbs.clear();
         JSONParser parser = new JSONParser(getActivity().getApplicationContext());
         parser.getAllLocations(Constants.getAllLocations, "GuideAddInfoFragment");
         parser.getPreferences(Constants.getPreferences, "GuideAddInfo");
@@ -59,9 +64,24 @@ public class GuideAddInfoFragment extends Fragment {
                 location = spnrLocation.getSelectedItem().toString();
                 contact = txtContact.getText().toString();
                 email = txtEmail.getText().toString();
+                String type = "";
+                Boolean ok = false;
+
+                StringTokenizer st = new StringTokenizer(location, ", ");
+                String city = st.nextToken();
+                String country = st.nextToken();
+
+                for (int i = 0; i < cbs.size(); i++) {
+                    if (cbs.get(i).isChecked()) {
+                        if (!type.equals("")) type += "/";
+                        type += cbs.get(i).getText().toString();
+                        ok = true;
+                    }
+                }
 
                 if (contact.equals("")) txtContact.setError("Required!");
                 else if (email.equals("")) txtEmail.setError("Required!");
+                else if(!ok) Toast.makeText(getContext(), "Must select atleast 1 specialty", Toast.LENGTH_SHORT).show();
                 else {
                     DBHelper db = new DBHelper(getActivity().getApplicationContext());
                     db.updSetting(RegisterActivity.fb_id, 0, "isTraveler");
@@ -72,7 +92,8 @@ public class GuideAddInfoFragment extends Fragment {
                         request.accumulate("country", "Philippines");
                         request.accumulate("contact_number", contact);
                         request.accumulate("email_address", email);
-                        request.accumulate("type", "Arts");
+                        request.accumulate("type", type);
+                        request.accumulate("profImage", RegisterActivity.image);
                         request.accumulate("guide_user_id", RegisterActivity.user_id);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -89,11 +110,10 @@ public class GuideAddInfoFragment extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(RegisterActivity.def == 0){
+                if (RegisterActivity.def == 0) {
                     MainActivity.manager.logOut();
                     getActivity().finish();
-                }
-                else getActivity().getSupportFragmentManager().popBackStackImmediate();
+                } else getActivity().getSupportFragmentManager().popBackStackImmediate();
             }
         });
         return view;

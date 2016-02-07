@@ -22,7 +22,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = "Create table "+FILTER+"(id integer primary key, gender varchar(6), " +
-                "minPrice integer, maxPrice integer, interest varchar(20))";
+                "minPrice integer, maxPrice integer, interest varchar(255))";
         String sql1 = "Create table "+SETTING+"(id integer primary key, fb_id varchar(50), alert integer, " +
                 "reminder integer, isTraveler integer)";
         String sql2 = "Create table "+BOOKING+"(id integer primary key autoincrement, travelerToken varchar(20), " +
@@ -95,14 +95,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void updFilterPrice(int min, int max){
         SQLiteDatabase db = this.getWritableDatabase();
-        String sql = "Update "+FILTER+" set minPrice="+min+", maxPrice="+max;
+        String sql = "Update "+FILTER+" set minPrice='"+min+"', maxPrice='"+max+"'";
         db.execSQL(sql);
         db.close();
     }
 
     public void updFilterInterest(String interest){
         SQLiteDatabase db = this.getWritableDatabase();
-        String sql = "Update "+FILTER+" set interest="+interest;
+        String sql = "Update "+FILTER+" set interest='"+interest+"'";
         db.execSQL(sql);
         db.close();
     }

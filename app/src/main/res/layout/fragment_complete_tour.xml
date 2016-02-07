@@ -98,32 +98,26 @@
                     android:layout_marginLeft="15dp"/>
 
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:padding="25dp">
+
+                <Button
+                    android:id="@+id/upcoming_complete"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Complete"
+                    android:background="@drawable/rounded_button"
+                    android:elevation="4dp"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="#fff"/>
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:padding="25dp">
-
-
-            <Button
-                android:id="@+id/upcoming_complete"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Complete"
-                android:background="@drawable/rounded_button"
-                android:elevation="4dp"
-                android:layout_marginLeft="5dp"
-                android:textColor="#fff"/>
-
-        </LinearLayout>
-    </RelativeLayout>
 </LinearLayout>

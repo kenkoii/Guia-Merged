@@ -21,67 +21,76 @@
             android:textColor="#fff"/>
     </RelativeLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="25dp">
-
-        <Spinner
-            android:id="@+id/spnrLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Location"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@drawable/rounded_edittext" />
-
-        <EditText
-            android:id="@+id/txtContact"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:hint="Contact number"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@drawable/rounded_edittext"
-            android:inputType="number"
-            android:maxLines="1"
-            android:layout_marginTop="10dp"/>
-
-        <EditText
-            android:id="@+id/txtEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:hint="Email Address"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@drawable/rounded_edittext"
-            android:maxLines="1"
-            android:layout_marginTop="10dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Check atleast 1 specialty for your profile."
-            android:layout_marginTop="20dp"/>
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/preferences_holder"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"/>
+            android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="25dp">
+
+                <Spinner
+                    android:id="@+id/spnrLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Location"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:background="@drawable/rounded_edittext" />
+
+                <EditText
+                    android:id="@+id/txtContact"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:hint="Contact number"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:background="@drawable/rounded_edittext"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:layout_marginTop="10dp"/>
+
+                <EditText
+                    android:id="@+id/txtEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:hint="Email Address"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:background="@drawable/rounded_edittext"
+                    android:maxLines="1"
+                    android:layout_marginTop="10dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Check atleast 1 specialty for your profile."
+                    android:layout_marginTop="20dp"/>
+
+                <LinearLayout
+                    android:id="@+id/preferences_holder"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="20dp"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true">
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom"
+                android:padding="25dp">
 
                 <Button
                     android:id="@+id/guide1_back"
@@ -104,9 +113,7 @@
                     android:elevation="4dp"
                     android:layout_marginLeft="5dp"
                     android:textColor="#fff"/>
-
             </LinearLayout>
-
-        </RelativeLayout>
-    </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

@@ -45,7 +45,7 @@ public class TripFragment extends Fragment {
             LoggedInGuide.mToolbar.setTitle("Tours");
             tabLayout.addTab(tabLayout.newTab().setText("Pending"));
         }
-        catch(Exception e){}
+        catch(Exception e){ LoggedInTraveler.mToolbar.setTitle("Tours");}
 
         tabLayout.addTab(tabLayout.newTab().setText("Upcoming"));
         tabLayout.addTab(tabLayout.newTab().setText("Previous"));
