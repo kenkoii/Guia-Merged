@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.LruCache;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -42,11 +43,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.logging.Filter;
 
 import ph.com.guia.Guide.GuideAddInfoFragment;
+import ph.com.guia.Guide.GuideCalendarFragment;
 import ph.com.guia.Guide.GuideProfileFragment;
 import ph.com.guia.Guide.LoggedInGuide;
+import ph.com.guia.Model.Note;
 import ph.com.guia.Navigation.FilterFragment;
 import ph.com.guia.Navigation.NoConnectionFragment;
 import ph.com.guia.Traveler.TravelerProfileFragment;
@@ -1144,6 +1148,180 @@ public class JSONParser {
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETPREFERENCES", error.getMessage());
                 getPreferences(url, activity);
+            }
+        });
+        mRequestQueue.add(jsonArrayRequest);
+    }
+
+    public void addNote(final JSONObject request, final String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //Log.e("Accept Booking", response.toString());
+                        try {
+                            String id, title, details, date;
+
+                            id = response.getString("_id");
+                            title = response.getString("title");
+                            details = response.getString("note_content");
+                            date = response.getString("note_date");
+
+                            GuideProfileFragment.notes.add(new Note(id, title, details, date));
+                            Toast.makeText(context, "Note Added!", Toast.LENGTH_SHORT).show();
+
+                            GuideCalendarFragment gcf = new GuideCalendarFragment();
+                            LoggedInGuide.fm.popBackStackImmediate();
+                            LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                            LoggedInGuide.ft.replace(R.id.drawer_fragment_container, gcf).addToBackStack(null).commit();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("ADDNOTE", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    addNote(request, url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", 0);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                    LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                }
+            }
+        });
+        mRequestQueue.add(jsonObjectRequest);
+    }
+
+    public void updateNote(final JSONObject request, final String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //Log.e("Accept Booking", response.toString());
+                        try {
+                            String id, title, details, date;
+
+                            id = response.getString("_id");
+                            title = response.getString("title");
+                            details = response.getString("note_content");
+                            date = response.getString("note_date");
+
+                            GuideCalendarFragment.deleteNote(id);
+                            GuideProfileFragment.notes.add(new Note(id, title, details, date));
+                            Toast.makeText(context, "Note Updated!", Toast.LENGTH_SHORT).show();
+
+                            GuideCalendarFragment gcf = new GuideCalendarFragment();
+                            LoggedInGuide.fm.popBackStackImmediate();
+                            LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                            LoggedInGuide.ft.replace(R.id.drawer_fragment_container, gcf).addToBackStack(null).commit();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("UPDATENOTE", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    updateNote(request, url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", 0);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                    LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                }
+            }
+        });
+        mRequestQueue.add(jsonObjectRequest);
+    }
+
+    public void deleteNote(final String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, "",
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String id;
+                            id = response.getString("_id");
+                            GuideCalendarFragment.deleteNote(id);
+
+                            Toast.makeText(context, "Note deleted!", Toast.LENGTH_SHORT).show();
+                            GuideCalendarFragment gcf = new GuideCalendarFragment();
+                            LoggedInGuide.fm.popBackStackImmediate();
+                            LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                            LoggedInGuide.ft.replace(R.id.drawer_fragment_container, gcf).addToBackStack(null).commit();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("UPDATENOTE", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    deleteNote(url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", 0);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                    LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                }
+            }
+        });
+        mRequestQueue.add(jsonObjectRequest);
+    }
+
+    public void getNotesByGuideId(final String url){
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, "",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        for(int i = 0; i < response.length(); i++){
+                            try {
+                                JSONObject req = response.getJSONObject(i);
+
+                                String id = req.getString("_id");
+                                String title = req.getString("title");
+                                String detail = req.getString("note_content");
+                                String date = req.getString("note_date");
+
+                                GuideProfileFragment.notes.add(new Note(id, title, detail, date));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("GETNOTE", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    getNotesByGuideId(url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", 0);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                    LoggedInGuide.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                }
             }
         });
         mRequestQueue.add(jsonArrayRequest);

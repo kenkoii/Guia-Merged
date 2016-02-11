@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.Helper.RVadapter;
 import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
+import ph.com.guia.Model.Note;
 import ph.com.guia.Model.Tours;
 import ph.com.guia.Model.review;
 import ph.com.guia.R;
@@ -38,6 +40,7 @@ public class GuideProfileFragment extends Fragment {
     public static RecyclerView rv;
     public static RVadapter adapter;
     public static ProgressDialog pd;
+    public static ArrayList<Note> notes = new ArrayList<Note>();
     double rating;
     String type;
 
@@ -48,6 +51,7 @@ public class GuideProfileFragment extends Fragment {
         LoggedInGuide.mToolbar.setTitle("Profile");
 
         mList.clear();
+        notes.clear();
         rating = getArguments().getDouble("rating");
         type = getArguments().getString("type");
 
@@ -71,6 +75,7 @@ public class GuideProfileFragment extends Fragment {
         rv.setLayoutManager(llm);
 
         JSONParser.getInstance(getActivity().getApplicationContext()).getReviewsByGuideId(Constants.getReviewsByGuideId + LoggedInGuide.guide_id);
+        JSONParser.getInstance(getContext()).getNotesByGuideId(Constants.getNotesByGuideId + LoggedInGuide.guide_id);
 
         guide_profile_cover = (LinearLayout) view.findViewById(R.id.guide_profile_cover);
         profImage = (ImageView) view.findViewById(R.id.main_profile_image);
