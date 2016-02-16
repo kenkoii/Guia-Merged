@@ -1,5 +1,6 @@
 package ph.com.guia.Guide;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
@@ -151,45 +152,47 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        imageUri = data.getData();
+        if(resultCode == Activity.RESULT_OK) {
+            imageUri = data.getData();
+            switch (requestCode) {
+                case 1:
+                    main_image.setImageURI(imageUri);
+                    //ImageResizer ir = new ImageResizer(getActivity().getApplicationContext());
+                    //ir.scaleImage(main_image, 425, 150);
+                    break;
+                case 2:
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 80);
+                    params.setMargins(5, 10, 5, 10);
+                    ImageView iv = new ImageView(getActivity().getApplicationContext());
+                    iv.setId(id++);
+                    iv.setImageURI(imageUri);
+                    iv.setLayoutParams(params);
+                    iv.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            intent.setFlags(id - 1);
+                            startActivityForResult(intent, 3);
+                        }
+                    });
+                    linearLayout.addView(iv);
 
-        switch (requestCode) {
-            case 1:
-                main_image.setImageURI(imageUri);
-                //ImageResizer ir = new ImageResizer(getActivity().getApplicationContext());
-                //ir.scaleImage(main_image, 425, 150);
-                break;
-            case 2:
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 80);
-                params.setMargins(5, 10, 5, 10);
-                ImageView iv = new ImageView(getActivity().getApplicationContext());
-                iv.setId(id++);
-                iv.setImageURI(imageUri);
-                iv.setLayoutParams(params);
-                iv.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        intent.setFlags(id - 1);
-                        startActivityForResult(intent, 3);
+                    try {
+                        if (new ConnectionChecker(getActivity().getApplicationContext()).isConnectedToInternet()) {
+                            Cloudinary cloudinary = new Cloudinary(Utils.cloudinaryUrlFromContext(getActivity().getApplicationContext()));
+                            File file = new File(getRealPathFromURI(imageUri));
+                            Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
+                            photos.add(uploadResult.get("url").toString());
+                        }
+                    } catch (IOException e) {
                     }
-                });
-                linearLayout.addView(iv);
 
-                try {
-                    if (new ConnectionChecker(getActivity().getApplicationContext()).isConnectedToInternet()) {
-                        Cloudinary cloudinary = new Cloudinary(Utils.cloudinaryUrlFromContext(getActivity().getApplicationContext()));
-                        File file = new File(getRealPathFromURI(imageUri));
-                        Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
-                        photos.add(uploadResult.get("url").toString());
-                    }
-                }catch(IOException e){}
-
-                break;
-            case 3:
-                int position = data.getFlags();
-                ((ImageView) linearLayout.findViewById(position)).setImageURI(imageUri);
-                break;
+                    break;
+                case 3:
+                    int position = data.getFlags();
+                    ((ImageView) linearLayout.findViewById(position)).setImageURI(imageUri);
+                    break;
+            }
         }
     }
 

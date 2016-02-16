@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,38 +20,39 @@ import com.paypal.android.sdk.payments.PayPalPayment;
 import com.paypal.android.sdk.payments.PayPalService;
 import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
 
-import ph.com.guia.Helper.ImageLoadTask;
 import ph.com.guia.Helper.JSONParser;
-import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
 import ph.com.guia.Model.Tours;
 import ph.com.guia.R;
 
-public class FragmentBookingRequest extends Fragment{
+public class FragmentBookingRequest extends Fragment implements DatePickerDialog.OnDateSetListener {
 
     public static ImageView iv;
     private static final String CONFIG_CLIENT_ID = "AdSWgpp_bt-NLQMoZBDquci7RxnqGAHAyww92qH2NBgrzYR6uVZj3AOdEEeg50B4IybD0y0wICbirfj6";
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_SANDBOX;
     private static PayPalConfiguration config;
+    static boolean startClicked = false;
+    TextView start_date, end_date;
+    Calendar now = Calendar.getInstance();
+    String start, end;
 
     Tours tour;
     TextView title, description, rate, points, duration, guide;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         config = new PayPalConfiguration()
                 .environment(CONFIG_ENVIRONMENT)
-                .clientId(CONFIG_CLIENT_ID)
-                .acceptCreditCards(false);
+                .clientId(CONFIG_CLIENT_ID);
         tour = getArguments().getParcelable("tour");
 
         Intent intent = new Intent(getContext(), PayPalService.class);
@@ -77,40 +76,74 @@ public class FragmentBookingRequest extends Fragment{
         rate.setText("Rate: "+tour.tour_rate);
         points.setText("Points Reward: "+tour.points);
         duration.setText("Duration: "+tour.tour_duration+" "+tour.duration_format);
+        guide.setText(tour.guide_name);
 
         Button btnBook = (Button) view.findViewById(R.id.detail_book);
 
         btnBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(tour.activity.equalsIgnoreCase("HomeFragment")){
+                    View view2 = inflater.inflate(R.layout.date_dialog, null, false);
+                    start_date = (TextView) view2.findViewById(R.id.dd_startDate);
+                    end_date = (TextView) view2.findViewById(R.id.dd_endDate);
 
-                final double rate;
-                String charge = "50PHP";
-                if(tour.tour_rate <= 500) rate = 50;
-                else{
-                    rate = tour.tour_rate * 0.1;
-                    charge = "10%";
+
+                    start_date.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startClicked = true;
+                            showDateDialog();
+                        }
+                    });
+
+                    end_date.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startClicked = false;
+                            showDateDialog();
+                        }
+                    });
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setIcon(R.drawable.ic_launcher);
+                    builder.setView(view2);
+                    builder.setTitle("Book Schedule");
+                    builder.setNegativeButton("Back", null);
+                    builder.setPositiveButton("Done", null);
+                    final AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            start = start_date.getText().toString();
+                            end = end_date.getText().toString();
+
+                            if (start.equalsIgnoreCase("Pick date"))
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        "Please pick starting date", Toast.LENGTH_SHORT).show();
+                            else if (end.equalsIgnoreCase("Pick date"))
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        "Please pick ending date", Toast.LENGTH_SHORT).show();
+                            else {
+                                alertDialog.dismiss();
+                                showDialog();
+                            }
+                        }
+                    });
+                }else {
+                    showDialog();
                 }
+            }
+        });
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setIcon(R.drawable.ic_launcher);
-                builder.setTitle("Notice");
-                builder.setMessage("\nTour price: "+tour.tour_rate+"\nService Charge: "+charge+
-                        "\nEstimated Tour Expense: "+(tour.tour_rate+rate)+
-                        "\n\nCharge upon booking: "+rate+"\n");
-                builder.setNegativeButton("Back", null);
-                builder.setPositiveButton("Book", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        PayPalPayment ppp = new PayPalPayment(new BigDecimal(String.valueOf(rate)), "PHP",
-                                tour.tour_name, PayPalPayment.PAYMENT_INTENT_SALE);
-                        Intent intent = new Intent(getContext(),
-                                PaymentActivity.class);
-                        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, ppp);
-                        startActivityForResult(intent, 1);
-                    }
-                });
-                builder.show();
+        guide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JSONParser.getInstance(getContext()).getGuideById(Constants.getGuideById + tour.tour_guideId,
+                        tour.tour_guideId, "GuideProfile");
             }
         });
         return view;
@@ -135,8 +168,13 @@ public class FragmentBookingRequest extends Fragment{
                             request.accumulate("booking_guide_id", tour.tour_guideId);
                             request.accumulate("booking_tour_id", tour.tour_id);
                             request.accumulate("booking_user_id", LoggedInTraveler.user_id);
-                            request.accumulate("start_date", "12/28/2015");
-                            request.accumulate("end_date", "12/28/2015");
+                            if(tour.activity.equalsIgnoreCase("HomeFragment")) {
+                                request.accumulate("start_date", start);
+                                request.accumulate("end_date", end);
+                            }else{
+                                request.accumulate("start_date", FragmentTripBooking.start);
+                                request.accumulate("end_date", FragmentTripBooking.end);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -145,9 +183,9 @@ public class FragmentBookingRequest extends Fragment{
                         parser.requestBooking(request, Constants.requestBooking);
                         //JSONObject obj = parser.makeHttpRequest("http://guia.herokuapp.com/api/v1/book", "POST", params);
                         //Toast.makeText(getActivity().getApplicationContext(), "CLicked!"+LoggedInTraveler.user_id, Toast.LENGTH_LONG).show();
-                        getActivity().getSupportFragmentManager().popBackStackImmediate();
-                        Toast.makeText(getContext(), "Successfully Booked!",
+                        Toast.makeText(getActivity().getApplicationContext(), "Successfully Booked!",
                                 Toast.LENGTH_LONG).show();
+                        getActivity().getSupportFragmentManager().popBackStackImmediate();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -158,5 +196,52 @@ public class FragmentBookingRequest extends Fragment{
                 System.out.println("An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
             }
         }
+    }
+
+    public void showDialog(){
+        final double rate;
+        String charge = "50PHP";
+        if(tour.tour_rate <= 500) rate = 50;
+        else{
+            rate = tour.tour_rate * 0.1;
+            charge = "10%";
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setIcon(R.drawable.ic_launcher);
+        builder.setTitle("Notice");
+        builder.setMessage("\nTour price: " + tour.tour_rate + "\nService Charge: " + charge +
+                "\nEstimated Tour Expense: " + (tour.tour_rate + rate) +
+                "\n\nCharge upon booking: " + rate + "\n");
+        builder.setNegativeButton("Back", null);
+        builder.setPositiveButton("Book", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                PayPalPayment ppp = new PayPalPayment(new BigDecimal(String.valueOf(rate)), "PHP",
+                        tour.tour_name, PayPalPayment.PAYMENT_INTENT_SALE);
+                Intent intent = new Intent(getContext(),
+                        PaymentActivity.class);
+                intent.putExtra(PaymentActivity.EXTRA_PAYMENT, ppp);
+                startActivityForResult(intent, 1);
+            }
+        });
+        builder.show();
+    }
+
+    public void showDateDialog(){
+        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                FragmentBookingRequest.this,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        );
+        dpd.setMinDate(now);
+        dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
+        if(startClicked) start_date.setText((month+1)+"/"+day+"/"+year);
+        else end_date.setText((month+1)+"/"+day+"/"+year);
     }
 }

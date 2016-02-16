@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ph.com.guia.Guide.LoggedInGuide;
+import ph.com.guia.Helper.RVadapter;
 import ph.com.guia.R;
 import ph.com.guia.Traveler.LoggedInTraveler;
 
@@ -27,7 +28,7 @@ public class TripFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
-
+    int position = 0;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +59,7 @@ public class TripFragment extends Fragment {
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                position = tab.getPosition();
                 viewPager.setCurrentItem(tab.getPosition());
             }
 
@@ -127,5 +129,13 @@ public class TripFragment extends Fragment {
         public int getCount() {
             return mNumOfTabs;
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        viewPager.setAdapter(new PagerAdapter
+                (getFragmentManager(), tabLayout.getTabCount()));
     }
 }

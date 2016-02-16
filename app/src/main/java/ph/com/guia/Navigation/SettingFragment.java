@@ -1,5 +1,7 @@
 package ph.com.guia.Navigation;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,8 +13,14 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import ph.com.guia.Guide.LoggedInGuide;
 import ph.com.guia.Helper.DBHelper;
+import ph.com.guia.Helper.JSONParser;
+import ph.com.guia.MainActivity;
+import ph.com.guia.Model.Constants;
 import ph.com.guia.R;
 import ph.com.guia.Traveler.LoggedInTraveler;
 
@@ -21,6 +29,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     Switch alert, reminder, isTraveler;
     DBHelper db = null;
     String fb_id;
+    boolean ok = false;
 
     @Nullable
     @Override
@@ -76,14 +85,56 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
             case R.id.type_switch: column = "isTraveler";
         }
 
-        if (isChecked) db.updSetting(fb_id, 1, column);
-        else db.updSetting(fb_id, 0, column);
+        if(column.equals("isTraveler")){
+            if(!ok) {
+                if (isChecked) showDialog("Traveler");
+                else showDialog("Guide");
+            }else ok = false;
+        }else{
+            if (isChecked) db.updSetting(fb_id, 1, column);
+            else db.updSetting(fb_id, 0, column);
+        }
+    }
 
-        if(column.equals("isTraveler") && isChecked){
-            Toast.makeText(getActivity().getApplicationContext(), "traveler type", Toast.LENGTH_LONG).show();
-        }
-        else if(column.equals("isTraveler") && !isChecked){
-            Toast.makeText(getActivity().getApplicationContext(), "guide type", Toast.LENGTH_LONG).show();
-        }
+    public void showDialog(final String type){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setIcon(R.drawable.ic_launcher);
+        builder.setTitle("Login As");
+        builder.setMessage("Are you sure you want to login as: " + type);
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ok = true;
+                if (type.equals("Traveler")) isTraveler.setChecked(false);
+                else isTraveler.setChecked(true);
+
+            }
+        });
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                MainActivity.manager.logOut();
+                if (type.equals("Traveler")) {
+                    db.updSetting(fb_id, 1, "isTraveler");
+                    LoggedInGuide.mToolbar = null;
+                } else db.updSetting(fb_id, 0, "isTraveler");
+
+                try {
+                    JSONObject request = new JSONObject();
+                    request.accumulate("facebook_id", fb_id);
+                    request.accumulate("name", MainActivity.name);
+                    request.accumulate("birthday", MainActivity.bday);
+                    request.accumulate("age", MainActivity.age);
+                    request.accumulate("gender", MainActivity.gender);
+                    request.accumulate("profImage", MainActivity.image);
+
+                    JSONParser.getInstance(getContext()).postLogin(request, Constants.login);
+                    getActivity().finish();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        builder.show();
     }
 }

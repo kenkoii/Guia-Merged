@@ -23,6 +23,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ph.com.guia.Guide.GuideCalendarFragment;
 import ph.com.guia.Helper.ConnectionChecker;
 import ph.com.guia.Helper.JSONParser;
@@ -175,6 +177,8 @@ public class LoggedInTraveler extends AppCompatActivity
             case R.id.done:
                 addedFrag = false;
                 this.getSupportFragmentManager().popBackStackImmediate();
+                HomeFragment.mList.clear();
+                JSONParser.getInstance(this).getAllTours(Constants.getAllTours);
         }
         return super.onOptionsItemSelected(item);
     }

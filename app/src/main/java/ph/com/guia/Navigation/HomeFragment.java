@@ -39,8 +39,7 @@ public class HomeFragment extends Fragment {
         setHasOptionsMenu(true);
 
         mList.clear();
-        JSONParser parser = new JSONParser(getActivity().getApplicationContext());
-        parser.getAllTours(Constants.getAllTours);
+        JSONParser.getInstance(getContext()).getAllTours(Constants.getAllTours);
     }
 
     @Override

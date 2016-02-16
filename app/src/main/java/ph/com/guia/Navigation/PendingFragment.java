@@ -30,6 +30,8 @@ public class PendingFragment extends Fragment {
     public static RecyclerView rv;
     public static RVadapter adapter;
     public static ProgressDialog pd;
+    public static LinearLayoutManager llm;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +59,7 @@ public class PendingFragment extends Fragment {
 
         rv = (RecyclerView) view.findViewById(R.id.cardList);
         rv.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 

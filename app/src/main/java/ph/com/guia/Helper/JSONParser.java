@@ -38,12 +38,15 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.Calendar;
+import java.util.StringTokenizer;
 import java.util.logging.Filter;
 
 import ph.com.guia.Guide.GuideAddInfoFragment;
@@ -232,7 +235,7 @@ public class JSONParser {
 
                                         UpcomingFragment.mList.add(new Tours(tour_id, tour_name, booking_id,
                                                 tour_description, date, user_name, tour_guideId, tour_rate,
-                                                main_image, tour_duration, null, points, "UpcomingFragment"));
+                                                main_image, tour_duration, null, points, "UpcomingFragment", ""));
                                     }
 
                                     if(i == response.length()-1){
@@ -247,7 +250,7 @@ public class JSONParser {
 
                                         UpcomingFragment.mList.add(new Tours(req.getString("status"), tour_name, booking_id,
                                                 tour_description, date, user_name, tour_guideId, tour_rate,
-                                                main_image, tour_duration, null, points, "UpcomingTraveler"));
+                                                main_image, tour_duration, null, points, "UpcomingTraveler", ""));
                                     }
 
                                     if(i == response.length()-1){
@@ -335,18 +338,18 @@ public class JSONParser {
                     @Override
                     public void onResponse(JSONArray response) {
                         String tour_id, tour_name, tour_location, tour_description,
-                                duration_format, tour_preference, tour_guideId,main_image;
+                                duration_format, tour_preference, tour_guideId,main_image,
+                                tour_gender, guide_name;
                         String[] additional_images;
                         int tour_duration, tour_rate, points;
 
                         size = response.length();
 
-                        //Toast.makeText(context, response.length()+"", Toast.LENGTH_LONG).show();
-
                         for(int i = 0; i < response.length(); i++){
                             try {
                                 JSONObject obj = response.getJSONObject(i);
                                 tour_guideId = obj.getString("tour_guide_id");
+                                guide_name = obj.getJSONObject("user").getString("name");
 
                                 if(!tour_guideId.equalsIgnoreCase("deactivated")) {
                                     tour_id = obj.getString("_id");
@@ -359,18 +362,48 @@ public class JSONParser {
                                     tour_rate = obj.getInt("rate");
                                     main_image = obj.getString("main_image");
                                     points = obj.getInt("points");
+                                    tour_gender = obj.getJSONObject("user").getString("gender");
 
-                                    HomeFragment.mList.add(new Tours(tour_id, tour_name, tour_location, tour_description, duration_format,
-                                            tour_preference, tour_guideId, tour_rate, main_image, tour_duration, null, points, "HomeFragment"));
+                                    if(context instanceof LoggedInGuide) {
+                                        HomeFragment.mList.add(new Tours(tour_id, tour_name, tour_location,
+                                                tour_description, duration_format, tour_preference, tour_guideId,
+                                                tour_rate, main_image, tour_duration, null, points, "HomeFragment",
+                                                guide_name));
+                                    }else{
+                                        DBHelper db = new DBHelper(context);
+                                        Cursor c = db.getFilter();
+                                        if(c.moveToFirst()) {
+                                            boolean ok = false;
+                                            String gender = c.getString(c.getColumnIndex("gender"));
+                                            String interest = c.getString(c.getColumnIndex("interest"));
+
+                                            StringTokenizer st = new StringTokenizer(tour_preference, "/");
+                                            while(st.hasMoreTokens()){
+                                                if(interest.contains(st.nextToken())){
+                                                    ok = true;
+                                                    break;
+                                                }
+                                            }
+
+                                            if((ok || interest.equals("13")) && (gender.equalsIgnoreCase(tour_gender) || gender.equalsIgnoreCase("Both")) &&
+                                                (!obj.getJSONObject("user").getString("id").equals(LoggedInTraveler.user_id))){
+                                                HomeFragment.mList.add(new Tours(tour_id, tour_name, tour_location,
+                                                        tour_description, duration_format, tour_preference, tour_guideId,
+                                                        tour_rate, main_image, tour_duration, null, points, "HomeFragment",
+                                                        guide_name));
+                                            }
+                                        }
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
-                            if(HomeFragment.mList.size() == size) {
+                            if(i == response.length()-1) {
                                 HomeFragment.adapter = new RVadapter(context, HomeFragment.mList, null, null, null);
                                 HomeFragment.rv.setAdapter(HomeFragment.adapter);
                                 MainActivity.pd.dismiss();
+                                HomeFragment.pd.dismiss();
                             }
                         }
 
@@ -384,7 +417,7 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("GETALLTOURS", error.getMessage());
-                if(new ConnectionChecker(context).isConnectedToInternet()){
+                if(new ConnectionChecker(context).isConnectedToInternet()) {
                     getAllTours(url);
                 }else{
                     Bundle bundle = new Bundle();
@@ -412,71 +445,75 @@ public class JSONParser {
                     @Override
                     public void onResponse(JSONArray response) {
                         String tour_id, tour_name, tour_location, tour_description,
-                                duration_format, tour_preference, tour_guideId,main_image;
+                                duration_format, tour_preference, tour_guideId,main_image,
+                                tour_gender, guide_name;
                         String[] additional_images;
                         int tour_duration, tour_rate, points;
 
-                        String[] preference = null;
                         DBHelper db = new DBHelper(context);
                         Cursor c = db.getFilter();
                         if(c.moveToFirst()){
                             String gender = c.getString(c.getColumnIndex("gender"));
                             String interest = c.getString(c.getColumnIndex("interest"));
-                            preference = new String[interest.length()];
-                            for(int i = 0; i<preference.length; i++){
-                                switch (interest.charAt(i)){
-                                    case '1': preference[i] = "Food"; break;
-                                    case '2': preference[i] = "Outdoors"; break;
-                                    case '3': preference[i] = "Culture"; break;
-                                    case '4': preference[i] = "Music"; break;
-                                    case '5': preference[i] = "Night Life"; break;
-                                }
-                            }
-                        }
-                        size = response.length();
 
-                        for(int i = 0; i < response.length(); i++){
-                            try {
-                                JSONObject obj = response.getJSONObject(i);
-                                boolean ok = false;
+                            size = response.length();
 
-                                if(preference != null){
-                                    for(int j = 0; j < preference.length; j++){
-                                        if(obj.getString("tour_preference").contains(preference[j])){
+                            Log.e("response", response.length()+"");
+                            for(int i = 0; i < response.length(); i++){
+                                try {
+                                    JSONObject obj = response.getJSONObject(i);
+                                    boolean ok = false;
+
+                                    tour_guideId = obj.getString("tour_guide_id");
+                                    guide_name = obj.getJSONObject("user").getString("name");
+                                    tour_preference = obj.getString("tour_preference");
+                                    tour_gender = obj.getJSONObject("user").getString("gender");
+
+                                    StringTokenizer st = new StringTokenizer(tour_preference, "/");
+                                    while(st.hasMoreTokens()){
+                                        if(interest.contains(st.nextToken())){
                                             ok = true;
                                             break;
                                         }
                                     }
+
+                                    Log.e("Error", String.valueOf(ok && !tour_guideId.equalsIgnoreCase("deactivated") &&
+                                            (gender.equalsIgnoreCase(tour_gender) || gender.equalsIgnoreCase("Both"))));
+                                    if(ok && !tour_guideId.equalsIgnoreCase("deactivated") &&
+                                            (gender.equalsIgnoreCase(tour_gender) || gender.equalsIgnoreCase("Both")) ) {
+                                        tour_id = obj.getString("_id");
+                                        tour_name = obj.getString("name");
+                                        tour_location = obj.getString("tour_location");
+                                        tour_duration = obj.getInt("duration");
+                                        duration_format = obj.getString("duration_format");
+                                        tour_description = obj.getString("details");
+                                        tour_rate = obj.getInt("rate");
+                                        main_image = obj.getString("main_image");
+                                        points = obj.getInt("points");
+
+                                        FragmentTripBooking.mList.add(new Tours(tour_id, tour_name, tour_location,
+                                                tour_description, duration_format, tour_preference, tour_guideId,
+                                                tour_rate, main_image, tour_duration, null, points, "FragmentTripBooking",
+                                                guide_name));
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
 
-                                tour_guideId = obj.getString("tour_guide_id");
+                                //Toast.makeText(context, response.toString(), Toast.LENGTH_LONG).show();
 
-                                if(ok && !tour_guideId.equalsIgnoreCase("deactivated")) {
-                                    tour_id = obj.getString("_id");
-                                    tour_name = obj.getString("name");
-                                    tour_location = obj.getString("tour_location");
-                                    tour_duration = obj.getInt("duration");
-                                    duration_format = obj.getString("duration_format");
-                                    tour_description = obj.getString("details");
-                                    tour_preference = obj.getString("tour_preference");
-                                    tour_rate = obj.getInt("rate");
-                                    main_image = obj.getString("main_image");
-                                    points = obj.getInt("points");
-
-                                    FragmentTripBooking.mList.add(new Tours(tour_id, tour_name, tour_location, tour_description, duration_format,
-                                            tour_preference, tour_guideId, tour_rate, main_image, tour_duration, null, points, "FragmentTripBooking"));
+                                if(i == response.length()-1) {
+                                    FragmentTripBooking.adapter = new RVadapter(context, FragmentTripBooking.mList, null, null, null);
+                                    FragmentTripBooking.rv.setAdapter(FragmentTripBooking.adapter);
+                                    FragmentTripBooking.pd.dismiss();
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-
-                            //Toast.makeText(context, response.toString(), Toast.LENGTH_LONG).show();
-
-                            if(i == size-1) {
-                                FragmentTripBooking.adapter = new RVadapter(context, FragmentTripBooking.mList, null, null, null);
-                                FragmentTripBooking.rv.setAdapter(FragmentTripBooking.adapter);
-                                FragmentTripBooking.pd.dismiss();
-                            }
+                        }else{
+                            FilterFragment ff = new FilterFragment();
+                            LoggedInTraveler.mToolbar.setTitle("Filter");
+                            LoggedInTraveler.fm.popBackStackImmediate();
+                            LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                            LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ff).addToBackStack(null).commit();
                         }
 
                         if(response.length() == 0){
@@ -537,8 +574,9 @@ public class JSONParser {
                                 main_image = response.getString("main_image");
                                 points = response.getInt("points");
 
-                                UpcomingFragment.mList.add(new Tours(tour_id, tour_name, tour_location, tour_description, date,
-                                        tour_preference, tour_guideId, tour_rate, main_image, tour_duration, null, points, "Upcoming"));
+                                UpcomingFragment.mList.add(new Tours(tour_id, tour_name, tour_location,
+                                        tour_description, date, tour_preference, tour_guideId, tour_rate,
+                                        main_image, tour_duration, null, points, "Upcoming", ""));
 
                                 UpcomingFragment.adapter = null;
                                 UpcomingFragment.adapter = new RVadapter(context, UpcomingFragment.mList, null, null, null);
@@ -813,8 +851,13 @@ public class JSONParser {
                                 GuideProfileFragment gpf = new GuideProfileFragment();
                                 gpf.setArguments(bundle);
 
-                                FragmentTransaction ft = LoggedInGuide.fm.beginTransaction();
-                                ft.replace(R.id.drawer_fragment_container, gpf).commit();
+                                try {
+                                    FragmentTransaction ft = LoggedInGuide.fm.beginTransaction();
+                                    ft.replace(R.id.drawer_fragment_container, gpf).commit();
+                                }catch(Exception e){
+                                    FragmentTransaction ft = LoggedInTraveler.fm.beginTransaction();
+                                    ft.replace(R.id.drawer_fragment_container, gpf).addToBackStack(null).commit();
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -1120,23 +1163,22 @@ public class JSONParser {
                                             if(cur.moveToFirst()) interest = cur.getString(cur.getColumnIndex("interest"));
                                             cur.close();
 
-                                            if(interest.contains(FilterFragment.cbs.get(j).getText().toString())){
+                                            if(interest.contains(FilterFragment.cbs.get(j).getText().toString()))
                                                 FilterFragment.cbs.get(j).setChecked(true);
 
-                                                FilterFragment.cbs.get(j).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                    @Override
-                                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                        String updInt = "";
-                                                        for(int k = 0; k < FilterFragment.cbs.size(); k++){
-                                                            if(FilterFragment.cbs.get(k).isChecked()){
-                                                                updInt += FilterFragment.cbs.get(k).getText().toString()+"/";
-                                                            }
-
-                                                            if(k == FilterFragment.cbs.size()-1) db.updFilterInterest(updInt);
+                                            FilterFragment.cbs.get(j).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                @Override
+                                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                    String updInt = "";
+                                                    for(int k = 0; k < FilterFragment.cbs.size(); k++){
+                                                        if(FilterFragment.cbs.get(k).isChecked()){
+                                                            updInt += FilterFragment.cbs.get(k).getText().toString()+"/";
                                                         }
+
+                                                        if(k == FilterFragment.cbs.size()-1) db.updFilterInterest(updInt);
                                                     }
-                                                });
-                                            }
+                                                }
+                                            });
                                         }
                                     }
                                 }
@@ -1170,11 +1212,11 @@ public class JSONParser {
                             GuideProfileFragment.notes.add(new Note(id, title, details, date));
                             Toast.makeText(context, "Note Added!", Toast.LENGTH_SHORT).show();
 
-                            GuideCalendarFragment gcf = new GuideCalendarFragment();
-                            LoggedInGuide.fm.popBackStackImmediate();
-                            LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
-                            LoggedInGuide.ft.replace(R.id.drawer_fragment_container, gcf).addToBackStack(null).commit();
+                            GuideCalendarFragment.refreshNote(new CalendarDay(GuideCalendarFragment
+                                    .formatter.parse(GuideCalendarFragment.date)));
                         } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
                             e.printStackTrace();
                         }
                     }
@@ -1209,19 +1251,19 @@ public class JSONParser {
                             String id, title, details, date;
 
                             id = response.getString("_id");
-                            title = response.getString("title");
-                            details = response.getString("note_content");
-                            date = response.getString("note_date");
+                            title = request.getString("title");
+                            details = request.getString("note_content");
+                            date = request.getString("note_date");
 
                             GuideCalendarFragment.deleteNote(id);
                             GuideProfileFragment.notes.add(new Note(id, title, details, date));
                             Toast.makeText(context, "Note Updated!", Toast.LENGTH_SHORT).show();
 
-                            GuideCalendarFragment gcf = new GuideCalendarFragment();
-                            LoggedInGuide.fm.popBackStackImmediate();
-                            LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
-                            LoggedInGuide.ft.replace(R.id.drawer_fragment_container, gcf).addToBackStack(null).commit();
+                            GuideCalendarFragment.refreshNote(new CalendarDay(GuideCalendarFragment
+                                    .formatter.parse(GuideCalendarFragment.date)));
                         } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
                             e.printStackTrace();
                         }
                     }
@@ -1257,11 +1299,12 @@ public class JSONParser {
                             GuideCalendarFragment.deleteNote(id);
 
                             Toast.makeText(context, "Note deleted!", Toast.LENGTH_SHORT).show();
-                            GuideCalendarFragment gcf = new GuideCalendarFragment();
-                            LoggedInGuide.fm.popBackStackImmediate();
-                            LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
-                            LoggedInGuide.ft.replace(R.id.drawer_fragment_container, gcf).addToBackStack(null).commit();
+
+                            GuideCalendarFragment.refreshNote(new CalendarDay(GuideCalendarFragment
+                                    .formatter.parse(GuideCalendarFragment.date)));
                         } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
                             e.printStackTrace();
                         }
                     }

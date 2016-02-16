@@ -30,7 +30,7 @@ import ph.com.guia.R;
 
 public class FragmentTripBooking extends Fragment {
 
-    String location, start, end;
+    public static String location, start, end;
     public static RecyclerView rv;
     public static LinearLayoutManager llm;
     public static RVadapter adapter;
@@ -83,5 +83,13 @@ public class FragmentTripBooking extends Fragment {
         fbr.setArguments(bundle);
         FragmentTransaction ft = LoggedInTraveler.fm.beginTransaction();
         ft.replace(R.id.drawer_fragment_container, fbr).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        llm.scrollToPosition(0);
+        adapter = new RVadapter(getActivity().getApplicationContext(), mList, null, null, null);
+        rv.setAdapter(adapter);
     }
 }

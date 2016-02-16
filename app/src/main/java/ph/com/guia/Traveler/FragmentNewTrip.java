@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.MainActivity;
@@ -29,6 +30,7 @@ public class FragmentNewTrip extends Fragment implements View.OnClickListener, D
     Button btnNext;
     TextView startDate, endDate;
     boolean startClicked = false;
+    Calendar start_calendar = null;
 
     @Nullable
     @Override
@@ -68,14 +70,16 @@ public class FragmentNewTrip extends Fragment implements View.OnClickListener, D
                 break;
             case R.id.new_travel_endDate:
                 startClicked = false;
-                dpd = DatePickerDialog.newInstance(
-                        this,
-                        now.get(Calendar.YEAR),
-                        now.get(Calendar.MONTH),
-                        now.get(Calendar.DAY_OF_MONTH)
-                );
-                dpd.setMinDate(now);
-                dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+                if(start_calendar != null) {
+                    dpd = DatePickerDialog.newInstance(
+                            this,
+                            start_calendar.get(Calendar.YEAR),
+                            start_calendar.get(Calendar.MONTH),
+                            start_calendar.get(Calendar.DAY_OF_MONTH)
+                    );
+                    dpd.setMinDate(start_calendar);
+                    dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+                }else Toast.makeText(getContext(), "Please pick starting date first", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.new_travel_next:
                 String location = spnrLocation.getSelectedItem().toString();
@@ -104,7 +108,9 @@ public class FragmentNewTrip extends Fragment implements View.OnClickListener, D
 
     @Override
     public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-        if(startClicked) startDate.setText((month+1)+"/"+day+"/"+year);
-        else endDate.setText((month+1)+"/"+day+"/"+year);
+        if(startClicked){
+            startDate.setText((month+1)+"/"+day+"/"+year);
+            start_calendar = new GregorianCalendar(year, month, day);
+        } else endDate.setText((month+1)+"/"+day+"/"+year);
     }
 }

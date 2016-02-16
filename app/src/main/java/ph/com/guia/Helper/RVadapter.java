@@ -205,7 +205,6 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                             View view = LoggedInTraveler.inflater.inflate(R.layout.rate_review, p, false);
                             final RatingBar rate_bar = (RatingBar) view.findViewById(R.id.rate_bar);
                             final EditText review_text = (EditText) view.findViewById(R.id.review_text);
-                            NetworkImageView niv = (NetworkImageView) view.findViewById(R.id.rate_rev_image);
                             imageLoader = JSONParser.getInstance(context).getImageLoader();
                             imageLoader.get(tours.get(index).main_image, ImageLoader.getImageListener(holder.iv,
                                     R.drawable.default_home_image, android.R.drawable.ic_dialog_alert));
@@ -265,8 +264,6 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                     }
                 });
             }
-
-            //MainActivity.pd.dismiss();
             HomeFragment.pd.dismiss();
         }
         else if(mi != null) {

@@ -1,8 +1,5 @@
 package ph.com.guia.Model;
 
-/**
- * Created by jadjaluddin on 8/5/2015.
- */
 public class PopularDestinations {
     public int icon;
     public String location;

@@ -1,8 +1,5 @@
 package ph.com.guia.Model;
 
-/**
- * Created by Stephanie on 8/6/2015.
- */
 public class MessageItem {
     public int image;
     public String name;

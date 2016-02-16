@@ -3,20 +3,17 @@ package ph.com.guia.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by Stephanie Lyn on 11/9/2015.
- */
 public class Tours implements Parcelable {
     public String tour_id, tour_name, tour_location, tour_description,
             duration_format, tour_preference, tour_guideId, main_image,
-            activity;
+            activity, guide_name;
     public String[] additional_images;
     public int tour_duration, tour_rate, points;
 
     public Tours(String tour_id, String tour_name, String tour_location,String tour_description,
                  String duration_format, String tour_preference, String tour_guideId, int tour_rate,
                  String main_image, int tour_duration, String[] additional_images, int points,
-                 String activity) {
+                 String activity, String guide_name) {
         this.tour_id = tour_id;
         this.tour_name = tour_name;
         this.tour_location = tour_location;
@@ -30,6 +27,7 @@ public class Tours implements Parcelable {
         this.additional_images = additional_images;
         this.points = points;
         this.activity = activity;
+        this.guide_name = guide_name;
     }
 
     protected Tours(Parcel in) {

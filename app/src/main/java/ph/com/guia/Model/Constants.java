@@ -1,8 +1,5 @@
 package ph.com.guia.Model;
 
-/**
- * Created by NMN on 12/15/2015.
- */
 public class Constants {
     public static String login = "http://guia.herokuapp.com/api/v1/login";
 

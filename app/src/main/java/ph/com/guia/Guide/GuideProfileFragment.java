@@ -31,6 +31,7 @@ import ph.com.guia.Model.Note;
 import ph.com.guia.Model.Tours;
 import ph.com.guia.Model.review;
 import ph.com.guia.R;
+import ph.com.guia.Traveler.LoggedInTraveler;
 
 public class GuideProfileFragment extends Fragment {
 
@@ -47,8 +48,10 @@ public class GuideProfileFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        LoggedInGuide.mToolbar.setTitle("Profile");
+        try {
+            LoggedInGuide.mToolbar.setTitle("Profile");
+            setHasOptionsMenu(true);
+        }catch(Exception e){}
 
         mList.clear();
         notes.clear();
@@ -102,14 +105,18 @@ public class GuideProfileFragment extends Fragment {
         rb.setNumStars(5);
         rb.setRating((float)rating);
 
-        Log.w("qweqwe", String.valueOf(rating)+" "+String.valueOf((float) rating));
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        LoggedInGuide.mToolbar.setTitle("Profile");
-        LoggedInGuide.doubleBackToExitPressedOnce = false;
+        try {
+            LoggedInGuide.mToolbar.setTitle("Profile");
+            LoggedInGuide.doubleBackToExitPressedOnce = false;
+        }catch(Exception e){
+            LoggedInTraveler.mToolbar.setTitle("Profile");
+            LoggedInTraveler.doubleBackToExitPressedOnce = false;
+        }
     }
 }

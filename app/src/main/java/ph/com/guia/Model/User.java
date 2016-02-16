@@ -1,8 +1,5 @@
 package ph.com.guia.Model;
 
-/**
- * Created by Stephanie Lyn on 11/9/2015.
- */
 public class User {
     public String id, name, birthday, gender, age, location, type;
     public int tourCount;
