@@ -238,9 +238,6 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                                         try{
                                             JSONObject user = new JSONObject();
                                             user.accumulate("id", MainActivity.user_id);
-                                            user.accumulate("facebook_id", MainActivity.fb_id);
-                                            user.accumulate("name", MainActivity.name);
-                                            user.accumulate("profImage", MainActivity.image);
 
                                             Log.e("ID: ", tours.get(index).tour_location);
                                             JSONObject request = new JSONObject();
@@ -305,7 +302,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                 public void onClick(View v) {
                     JSONObject request = new JSONObject();
                     try {
-                        Log.e("reqid", index+"");
+                        Log.e("reqid", index+" "+pr.get(index).booking_id);
                         request.accumulate("_id", pr.get(index).booking_id);
                     } catch (JSONException e) {
                         e.printStackTrace();

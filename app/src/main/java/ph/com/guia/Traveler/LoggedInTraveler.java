@@ -37,6 +37,7 @@ import ph.com.guia.Navigation.NoConnectionFragment;
 import ph.com.guia.Navigation.PreviousFragment;
 import ph.com.guia.Navigation.SettingFragment;
 import ph.com.guia.Navigation.TripFragment;
+import ph.com.guia.Navigation.TripListFragment;
 import ph.com.guia.Navigation.UpcomingFragment;
 import ph.com.guia.R;
 
@@ -60,6 +61,7 @@ public class LoggedInTraveler extends AppCompatActivity
     FilterFragment ff = new FilterFragment();
     GuideCalendarFragment gcf = new GuideCalendarFragment();
     FragmentNewTrip fnt = new FragmentNewTrip();
+    TripListFragment tlf = new TripListFragment();
     public static FragmentManager fm;
     public static LayoutInflater inflater;
 
@@ -213,6 +215,10 @@ public class LoggedInTraveler extends AppCompatActivity
                 ft = getSupportFragmentManager().beginTransaction();
                 TripFragment tf = new TripFragment();
                 ft.replace(R.id.drawer_fragment_container, tf).commit();
+                break;
+            case R.id.nav_trips:
+                ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.drawer_fragment_container, tlf).commit();
                 break;
             case R.id.nav_messages:
                 ft = getSupportFragmentManager().beginTransaction();

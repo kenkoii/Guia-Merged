@@ -71,7 +71,7 @@ public class LoggedInGuide extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //FacebookSdk.sdkInitialize(this);
-        setContentView(R.layout.drawer_layout);
+        setContentView(R.layout.drawer_layout2);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 

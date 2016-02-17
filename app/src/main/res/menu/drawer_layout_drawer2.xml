@@ -11,10 +11,6 @@
             android:icon="@drawable/scheds"
             android:title="Tours" />
         <item
-            android:id="@+id/nav_trips"
-            android:icon="@drawable/scheds"
-            android:title="My Trips" />
-        <item
             android:id="@+id/nav_messages"
             android:icon="@drawable/messages"
             android:title="Messages" />

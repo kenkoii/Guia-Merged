@@ -32,13 +32,12 @@ public class UpcomingFragment extends Fragment {
     public static RVadapter adapter;
     public static ProgressDialog pd;
     public static LinearLayoutManager llm;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);
-
-        //Log.e("sizes", UpcomingFragment.mList.size() + " " + JSONParser.size);
         mList.clear();
 
         try {

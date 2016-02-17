@@ -36,6 +36,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -54,8 +55,11 @@ import ph.com.guia.Guide.GuideCalendarFragment;
 import ph.com.guia.Guide.GuideProfileFragment;
 import ph.com.guia.Guide.LoggedInGuide;
 import ph.com.guia.Model.Note;
+import ph.com.guia.Model.Trip;
 import ph.com.guia.Navigation.FilterFragment;
 import ph.com.guia.Navigation.NoConnectionFragment;
+import ph.com.guia.Navigation.PreviousFragment;
+import ph.com.guia.Navigation.TripListFragment;
 import ph.com.guia.Traveler.TravelerProfileFragment;
 import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
@@ -263,15 +267,15 @@ public class JSONParser {
                                 e.printStackTrace();
                             }
 
-                            if(response.length()-1 == i && size == 0 &&
-                                    activity.equalsIgnoreCase("PendingFragment")) PendingFragment.pd.dismiss();
-                            if(response.length()-1 == i && size == 0 &&
-                                    activity.equalsIgnoreCase("UpcomingFragment")) UpcomingFragment.pd.dismiss();
+                            if(response.length()-1 == i && activity.equalsIgnoreCase("PendingFragment"))
+                                PendingFragment.pd.dismiss();
+                            else if(response.length()-1 == i && (activity.equalsIgnoreCase("UpcomingFragment") ||
+                                    activity.equalsIgnoreCase("UpcomingTraveler"))) UpcomingFragment.pd.dismiss();
                         }
 
                         if(response.length() == 0 && activity.equalsIgnoreCase("PendingFragment")) PendingFragment.pd.dismiss();
-                        else if(response.length() == 0 && activity.equalsIgnoreCase("UpcomingFragment") ||
-                                activity.equalsIgnoreCase("UpcomingTraveler")) UpcomingFragment.pd.dismiss();
+                        else if(response.length() == 0 && (activity.equalsIgnoreCase("UpcomingFragment") ||
+                                activity.equalsIgnoreCase("UpcomingTraveler"))) UpcomingFragment.pd.dismiss();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -646,7 +650,7 @@ public class JSONParser {
     }
 
     public void postLogin(final JSONObject request, final String url){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
+        JsonObjectRequest jsonObjectRequest =    new JsonObjectRequest(Request.Method.POST, url, request,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -783,7 +787,6 @@ public class JSONParser {
                         intent.putExtra("email", GuideAddInfoFragment.email);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(intent);
-                        ((Activity)context).finish();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -845,6 +848,15 @@ public class JSONParser {
                         }
                         else if(activity.equalsIgnoreCase("GuideProfile")){
                             try {
+                                if(LoggedInGuide.age == null){
+                                    LoggedInGuide.name = response.getJSONObject("user").getString("name");
+                                    LoggedInGuide.age = response.getJSONObject("user").getString("age");
+                                    LoggedInGuide.location = response.getString("city")+", "+response.getString("country");
+                                    LoggedInGuide.email = email;
+                                    LoggedInGuide.contact = contact;
+                                    LoggedInGuide.image = response.getJSONObject("user").getString("profImage");
+                                }
+
                                 Bundle bundle = new Bundle();
                                 bundle.putDouble("rating", response.getDouble("rating"));
                                 bundle.putString("type", response.getString("type"));
@@ -1075,12 +1087,23 @@ public class JSONParser {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject req = new JSONObject();
+                            req.accumulate("trip_user_id", MainActivity.user_id);
+                            req.accumulate("location", response.getJSONObject("tour").getString("tour_location"));
+                            req.accumulate("date_from", response.getString("start_date"));
+                            req.accumulate("date_to", response.getString("end_date"));
 
+                            JSONParser.getInstance(context).postTrip(req, Constants.postTrip);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("POSTRATEREVIEW", error.getMessage());
+
             }
         });
         mRequestQueue.add(jsonObjectRequest);
@@ -1368,5 +1391,69 @@ public class JSONParser {
             }
         });
         mRequestQueue.add(jsonArrayRequest);
+    }
+
+    public void getTripsById(final String url){
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, "",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        for(int i = 0; i < response.length(); i++){
+                            try {
+                                JSONObject req = response.getJSONObject(i);
+
+                                String id = req.getString("_id");
+                                String location = req.getString("location");
+                                String start_date = req.getString("date_from");
+                                String end_date = req.getString("date_to");
+                                String image = req.getString("image");
+                                String description = req.getString("description");
+
+                                TripListFragment.mList.add(new Trip(id, location, start_date, end_date, image, description));
+
+                                if(i == response.length()-1){
+                                    TripListFragment.adapter = new LVadapter(context, TripListFragment.mList);
+                                    TripListFragment.lv.setAdapter(TripListFragment.adapter);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("GETTRIPS", error.getMessage());
+                if(new ConnectionChecker(context).isConnectedToInternet()){
+                    getTripsById(url);
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", 0);
+
+                    NoConnectionFragment ncf = new NoConnectionFragment();
+                    ncf.setArguments(bundle);
+
+                    LoggedInTraveler.ft = LoggedInGuide.fm.beginTransaction();
+                    LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, ncf).addToBackStack(null).commit();
+                }
+            }
+        });
+        mRequestQueue.add(jsonArrayRequest);
+    }
+
+    public void postTrip(final JSONObject request, final String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e("asdas", "New Trip Added!");
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("POSTTRIP", error.getMessage());
+            }
+        });
+        mRequestQueue.add(jsonObjectRequest);
     }
 }

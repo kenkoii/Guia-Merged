@@ -98,11 +98,10 @@ public class GuideAddInfoFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-
                     JSONParser parser = new JSONParser(getActivity().getApplicationContext());
                     parser.postGuide(request, Constants.postGuide);
-                    //JSONObject obj = parser.makeHttpRequest("http://guia.herokuapp.com/api/v1/guide", "POST", params);
+
+                    getActivity().finish();
                 }
             }
         });

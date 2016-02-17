@@ -127,6 +127,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
                     request.accumulate("age", MainActivity.age);
                     request.accumulate("gender", MainActivity.gender);
                     request.accumulate("profImage", MainActivity.image);
+                    request.accumulate("coverPhoto", MainActivity.cover);
 
                     JSONParser.getInstance(getContext()).postLogin(request, Constants.login);
                     getActivity().finish();

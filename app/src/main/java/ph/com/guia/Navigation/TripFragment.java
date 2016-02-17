@@ -28,7 +28,7 @@ public class TripFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
-    int position = 0;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +49,7 @@ public class TripFragment extends Fragment {
         catch(Exception e){ LoggedInTraveler.mToolbar.setTitle("Tours");}
 
         tabLayout.addTab(tabLayout.newTab().setText("Upcoming"));
-        tabLayout.addTab(tabLayout.newTab().setText("Previous"));
+        //tabLayout.addTab(tabLayout.newTab().setText("Previous"));
 
         viewPager = (ViewPager) inflatedView.findViewById(R.id.viewpager);
 
@@ -59,7 +59,6 @@ public class TripFragment extends Fragment {
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                position = tab.getPosition();
                 viewPager.setCurrentItem(tab.getPosition());
             }
 
@@ -135,7 +134,9 @@ public class TripFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        viewPager.setAdapter(new PagerAdapter
-                (getFragmentManager(), tabLayout.getTabCount()));
+        try {
+            viewPager.setAdapter(new PagerAdapter
+                    (getFragmentManager(), tabLayout.getTabCount()));
+        }catch(Exception e){}
     }
 }

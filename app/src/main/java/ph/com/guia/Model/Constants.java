@@ -29,6 +29,9 @@ public class Constants {
 
     public static String getPreferences = "http://guia.herokuapp.com/api/v1/preferences";
 
+    public static String getTripsById = "http://guia.herokuapp.com/api/v1/trip/";
+    public static String postTrip = "http://guia.herokuapp.com/api/v1/trip";
+
     public static String addNote = "http://guia.herokuapp.com/api/v1/note";
     public static String getNotesByGuideId = "http://guia.herokuapp.com/api/v1/note/";
     public static String updateNote = "http://guia.herokuapp.com/api/v1/notes/";

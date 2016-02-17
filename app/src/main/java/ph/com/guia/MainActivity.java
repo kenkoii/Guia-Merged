@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                             request.accumulate("age", age);
                             request.accumulate("gender", gender);
                             request.accumulate("profImage", image);
+                            request.accumulate("coverPhoto", cover);
 
                             JSONParser parser = new JSONParser(MainActivity.this);
                             parser.postLogin(request, Constants.login);
