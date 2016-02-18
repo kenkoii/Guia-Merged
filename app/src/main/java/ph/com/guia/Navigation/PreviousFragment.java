@@ -29,37 +29,22 @@ public class PreviousFragment extends Fragment {
     public static RVadapter adapter;
     public static ProgressDialog pd;
     public static LinearLayoutManager llm;
+    public static String location;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        location = getArguments().getString("location");
         pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);
         mList.clear();
 
         try {
-            LoggedInGuide.mToolbar.setTitle("Tours");
-            if (!LoggedInGuide.guide_id.equals("")) {
-                JSONObject request = new JSONObject();
-                try {
-                    request.accumulate("booking_guide_id", LoggedInGuide.guide_id);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                JSONParser parser = new JSONParser(getActivity());
-                parser.getBookingsById(request, Constants.getBookingsByGuideId, "PreviousFragment");
-            }
-        }catch(Exception e){
             JSONObject request = new JSONObject();
-            try {
-                request.accumulate("booking_user_id", LoggedInTraveler.user_id);
-            } catch (JSONException je) {
-                je.printStackTrace();
-            }
-
-            JSONParser parser = new JSONParser(getActivity());
-            parser.getBookingsById(request, Constants.getBookingsByUserId, "PreviousTraveler");
+            request.accumulate("booking_user_id", LoggedInTraveler.user_id);
+            JSONParser.getInstance(getContext()).getBookingsById(request, Constants.getBookingsByUserId, "PreviousTraveler");
+        } catch (JSONException je) {
+            je.printStackTrace();
         }
     }
 

@@ -178,9 +178,9 @@ public class LoggedInTraveler extends AppCompatActivity
                 break;
             case R.id.done:
                 addedFrag = false;
-                this.getSupportFragmentManager().popBackStackImmediate();
-                HomeFragment.mList.clear();
-                JSONParser.getInstance(this).getAllTours(Constants.getAllTours);
+                ft = getSupportFragmentManager().beginTransaction();
+                HomeFragment home = new HomeFragment();
+                ft.replace(R.id.drawer_fragment_container, home).commit();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -189,6 +189,9 @@ public class LoggedInTraveler extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        try{fm.popBackStackImmediate();}
+        catch(Exception e){}
+
         addedFrag = false;
         doubleBackToExitPressedOnce = false;
 

@@ -63,7 +63,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
         this.tours = tours;
         this.mi = mi;
         this.user = user;
-        this.pr = pr;
+        if(pr != null) this.pr = pr;
         this.context = context;
 
         if(tours != null){
@@ -201,10 +201,17 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                             HomeFragment.onCardClick(tours.get(index));
                         else if(tours.get(index).activity.equalsIgnoreCase("FragmentTripBooking"))
                             FragmentTripBooking.onCardClick(tours.get(index));
-                        else if(tours.get(index).activity.equalsIgnoreCase("UpcomingTraveler")){
+                        else if(tours.get(index).activity.equalsIgnoreCase("UpcomingTraveler") &&
+                                ok[index]){
                             View view = LoggedInTraveler.inflater.inflate(R.layout.rate_review, p, false);
                             final RatingBar rate_bar = (RatingBar) view.findViewById(R.id.rate_bar);
                             final EditText review_text = (EditText) view.findViewById(R.id.review_text);
+                            TextView tour_name = (TextView) view.findViewById(R.id.rate_rev_tourName);
+                            TextView tour_guide = (TextView) view.findViewById(R.id.rate_rev_guideName);
+
+                            tour_name.setText(tours.get(index).tour_name);
+                            tour_guide.setText(tours.get(index).guide_name);
+
                             imageLoader = JSONParser.getInstance(context).getImageLoader();
                             imageLoader.get(tours.get(index).main_image, ImageLoader.getImageListener(holder.iv,
                                     R.drawable.default_home_image, android.R.drawable.ic_dialog_alert));
@@ -238,6 +245,8 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                                         try{
                                             JSONObject user = new JSONObject();
                                             user.accumulate("id", MainActivity.user_id);
+                                            user.accumulate("name", MainActivity.name);
+                                            user.accumulate("profImage", MainActivity.image);
 
                                             Log.e("ID: ", tours.get(index).tour_location);
                                             JSONObject request = new JSONObject();

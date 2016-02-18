@@ -47,9 +47,9 @@ public class HomeFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
 
         try {
-            LoggedInGuide.mToolbar.setTitle("Popular Destination");
+            LoggedInGuide.mToolbar.setTitle("Explore");
         }catch (Exception e) {
-            LoggedInTraveler.mToolbar.setTitle("Popular Destination");
+            LoggedInTraveler.mToolbar.setTitle("Explore");
             inflater.inflate(R.menu.filter, menu);
         }
     }
@@ -78,10 +78,10 @@ public class HomeFragment extends Fragment {
         adapter = new RVadapter(getActivity().getApplicationContext(), HomeFragment.mList, null, null, null);
         rv.setAdapter(adapter);
         try {
-            LoggedInGuide.mToolbar.setTitle("Popular Destination");
+            LoggedInGuide.mToolbar.setTitle("Explore");
             LoggedInGuide.doubleBackToExitPressedOnce = false;
         }catch (Exception e){
-            LoggedInTraveler.mToolbar.setTitle("Popular Destination");
+            LoggedInTraveler.mToolbar.setTitle("Explore");
             LoggedInTraveler.doubleBackToExitPressedOnce = false;
         }
 

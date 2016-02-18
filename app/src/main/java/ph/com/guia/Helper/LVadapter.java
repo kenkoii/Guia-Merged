@@ -40,7 +40,7 @@ public class LVadapter extends ArrayAdapter<Trip> {
         TextView location = (TextView) convertView.findViewById(R.id.trip_location);
         TextView detail = (TextView) convertView.findViewById(R.id.trip_detail);
 
-        location.setText(trips.get(position).location);
+        location.setText("To: "+trips.get(position).location);
         detail.setText(trips.get(position).description);
 
         return convertView;

@@ -162,6 +162,8 @@ public class LoggedInGuide extends AppCompatActivity
             return true;
         }
 
+        if(addedFrag) fm.popBackStackImmediate();
+
         if(!new ConnectionChecker(this).isConnectedToInternet()){
             Bundle bundle = new Bundle();
             bundle.putInt("id", id);

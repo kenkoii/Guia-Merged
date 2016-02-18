@@ -77,6 +77,7 @@ import ph.com.guia.Traveler.FragmentBookingRequest;
 import ph.com.guia.Traveler.FragmentNewTrip;
 import ph.com.guia.Traveler.FragmentTripBooking;
 import ph.com.guia.Traveler.LoggedInTraveler;
+import ph.com.guia.Traveler.UpdateTripFragment;
 
 public class JSONParser {
 
@@ -211,7 +212,6 @@ public class JSONParser {
                                 String user_age = req.getJSONObject("user").getString("age");
                                 tour_id = req.getJSONObject("tour").getString("id");
                                 tour_name = req.getJSONObject("tour").getString("name");
-                                //tour_location = req.getJSONObject("tour").getString("tour_location");
                                 tour_duration = req.getJSONObject("tour").getInt("duration");
                                 tour_description = req.getJSONObject("tour").getString("details");
                                 //tour_preference = req.getJSONObject("tour").getString("tour_preference");
@@ -232,6 +232,7 @@ public class JSONParser {
                                     if(i == response.length()-1) {
                                         PendingFragment.adapter = new RVadapter(context, null, null, null, PendingFragment.mList);
                                         PendingFragment.rv.setAdapter(PendingFragment.adapter);
+                                        PendingFragment.pd.dismiss();
                                     }
                                 }else if(activity.equalsIgnoreCase("UpcomingFragment")){
                                     if (req.getString("status").equalsIgnoreCase("accepted")) {
@@ -262,15 +263,27 @@ public class JSONParser {
                                         UpcomingFragment.rv.setAdapter(UpcomingFragment.adapter);
                                         UpcomingFragment.pd.dismiss();
                                     }
+                                }else if(activity.equalsIgnoreCase("PreviousTraveler")){
+                                    tour_location = req.getJSONObject("tour").getString("tour_location");
+                                    if (req.getString("status").equalsIgnoreCase("done") &&
+                                            tour_location.equalsIgnoreCase(PreviousFragment.location)) {
+                                        size++;
+
+                                        PreviousFragment.mList.add(new Tours(req.getString("status"), tour_name, booking_id,
+                                                tour_description, date, user_name, tour_guideId, tour_rate,
+                                                main_image, tour_duration, null, points, "PreviousTraveler", ""));
+                                    }
+
+                                    if(i == response.length()-1){
+                                        PreviousFragment.adapter = new RVadapter(context, PreviousFragment.mList, null, null, null);
+                                        PreviousFragment.rv.setAdapter(PreviousFragment.adapter);
+                                        PreviousFragment.pd.dismiss();
+                                        LoggedInTraveler.mToolbar.setTitle(PreviousFragment.location+" Tours");
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
-                            if(response.length()-1 == i && activity.equalsIgnoreCase("PendingFragment"))
-                                PendingFragment.pd.dismiss();
-                            else if(response.length()-1 == i && (activity.equalsIgnoreCase("UpcomingFragment") ||
-                                    activity.equalsIgnoreCase("UpcomingTraveler"))) UpcomingFragment.pd.dismiss();
                         }
 
                         if(response.length() == 0 && activity.equalsIgnoreCase("PendingFragment")) PendingFragment.pd.dismiss();
@@ -404,10 +417,10 @@ public class JSONParser {
                             }
 
                             if(i == response.length()-1) {
-                                HomeFragment.adapter = new RVadapter(context, HomeFragment.mList, null, null, null);
-                                HomeFragment.rv.setAdapter(HomeFragment.adapter);
                                 MainActivity.pd.dismiss();
                                 HomeFragment.pd.dismiss();
+                                HomeFragment.adapter = new RVadapter(context, HomeFragment.mList, null, null, null);
+                                HomeFragment.rv.setAdapter(HomeFragment.adapter);
                             }
                         }
 
@@ -864,6 +877,9 @@ public class JSONParser {
                                 gpf.setArguments(bundle);
 
                                 try {
+                                    try{ LoggedInGuide.fm.popBackStackImmediate();}
+                                    catch(Exception e){}
+
                                     FragmentTransaction ft = LoggedInGuide.fm.beginTransaction();
                                     ft.replace(R.id.drawer_fragment_container, gpf).commit();
                                 }catch(Exception e){
@@ -1414,6 +1430,7 @@ public class JSONParser {
                                 if(i == response.length()-1){
                                     TripListFragment.adapter = new LVadapter(context, TripListFragment.mList);
                                     TripListFragment.lv.setAdapter(TripListFragment.adapter);
+                                    TripListFragment.pd.dismiss();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1447,6 +1464,24 @@ public class JSONParser {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.e("asdas", "New Trip Added!");
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("POSTTRIP", error.getMessage());
+            }
+        });
+        mRequestQueue.add(jsonObjectRequest);
+    }
+
+    public void updateTrip(final JSONObject request, final String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Toast.makeText(context, "Trip Updated!", Toast.LENGTH_SHORT).show();
+                        LoggedInTraveler.fm.popBackStackImmediate();
+                        UpdateTripFragment.pd.dismiss();
                     }
                 }, new Response.ErrorListener() {
             @Override
