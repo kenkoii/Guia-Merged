@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         pd.dismiss();
-                        MainActivity.this.finish();
+                        //MainActivity.this.finish();
                     }
                 });
         Bundle parameters = new Bundle();

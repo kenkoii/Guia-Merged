@@ -16,6 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.yahoo.mobile.client.android.util.rangeseekbar.RangeSeekBar;
+
 import java.util.ArrayList;
 
 import ph.com.guia.Helper.DBHelper;
@@ -28,6 +30,7 @@ public class FilterFragment extends Fragment{
     public static LinearLayout linearLayout;
     public static ArrayList<CheckBox> cbs = new ArrayList<CheckBox>();
     public static ProgressDialog pd;
+    RangeSeekBar rsb;
     RadioGroup rg;
     RadioButton rb_both, rb_male, rb_female;
     DBHelper db;
@@ -58,6 +61,15 @@ public class FilterFragment extends Fragment{
         rb_male = (RadioButton) view.findViewById(R.id.rb_male);
         rb_female = (RadioButton) view.findViewById(R.id.rb_female);
         linearLayout = (LinearLayout) view.findViewById(R.id.filter_cbs);
+        rsb = (RangeSeekBar) view.findViewById(R.id.range_seekbar);
+
+        rsb.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
+            @Override
+            public void onRangeSeekBarValuesChanged(RangeSeekBar bar, Object minValue, Object maxValue) {
+                rsb.setSelectedMaxValue((Number) maxValue);
+                rsb.setSelectedMinValue((Number) minValue);
+            }
+        });
 
         JSONParser parser = new JSONParser(getActivity().getApplicationContext());
         parser.getPreferences(Constants.getPreferences, "TravelerFilter");

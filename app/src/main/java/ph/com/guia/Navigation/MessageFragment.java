@@ -18,6 +18,7 @@ import ph.com.guia.R;
 import ph.com.guia.Traveler.LoggedInTraveler;
 
 public class MessageFragment extends Fragment {
+    //TODO: Kentoy
     ArrayList<MessageItem> mList = new ArrayList<MessageItem>();
 
     @Override

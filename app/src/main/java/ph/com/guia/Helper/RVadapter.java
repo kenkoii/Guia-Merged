@@ -42,6 +42,7 @@ import ph.com.guia.Model.Tours;
 import ph.com.guia.Model.User;
 import ph.com.guia.Model.review;
 import ph.com.guia.Navigation.HomeFragment;
+import ph.com.guia.Navigation.MessageDetailFragment;
 import ph.com.guia.Navigation.PendingFragment;
 import ph.com.guia.R;
 import ph.com.guia.Traveler.FragmentTripBooking;
@@ -273,9 +274,28 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
             HomeFragment.pd.dismiss();
         }
         else if(mi != null) {
+            //TODO: Kentoy
             holder.message_name.setText(mi.get(position).name);
             holder.message_details.setText(mi.get(position).message_part);
             holder.message_image.setImageResource(mi.get(position).image);
+
+            holder.message_view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MessageDetailFragment mdf = new MessageDetailFragment();
+                    try{
+                        LoggedInGuide.mToolbar.setTitle(mi.get(index).name);
+                        LoggedInGuide.addedFrag = true;
+                        LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
+                        LoggedInGuide.ft.replace(R.id.drawer_fragment_container, mdf).addToBackStack(null).commit();
+                    }catch(Exception e){
+                        LoggedInTraveler.mToolbar.setTitle(mi.get(index).name);
+                        LoggedInTraveler.addedFrag = true;
+                        LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                        LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, mdf).addToBackStack(null).commit();
+                    }
+                }
+            });
         }
         else  if(user != null){
             holder.guide_name.setText(user.get(position).name);
