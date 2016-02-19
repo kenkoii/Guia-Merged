@@ -38,6 +38,7 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);
         mList.clear();
         JSONParser.getInstance(getContext()).getAllTours(Constants.getAllTours);
     }
@@ -72,9 +73,11 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         llm.scrollToPosition(0);
-        pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);
+
+        if(mList.size() > 0)
+            pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);
+
         adapter = new RVadapter(getActivity().getApplicationContext(), HomeFragment.mList, null, null, null);
         rv.setAdapter(adapter);
         try {

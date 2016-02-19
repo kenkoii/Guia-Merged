@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.Model.Constants;
@@ -42,6 +43,7 @@ public class FragmentBookingRequest extends Fragment implements DatePickerDialog
     static boolean startClicked = false;
     TextView start_date, end_date;
     Calendar now = Calendar.getInstance();
+    Calendar start_calendar;
     String start, end;
 
     Tours tour;
@@ -93,7 +95,14 @@ public class FragmentBookingRequest extends Fragment implements DatePickerDialog
                         @Override
                         public void onClick(View v) {
                             startClicked = true;
-                            showDateDialog();
+                            DatePickerDialog dpd = DatePickerDialog.newInstance(
+                                    FragmentBookingRequest.this,
+                                    now.get(Calendar.YEAR),
+                                    now.get(Calendar.MONTH),
+                                    now.get(Calendar.DAY_OF_MONTH)
+                            );
+                            dpd.setMinDate(now);
+                            dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
                         }
                     });
 
@@ -101,7 +110,16 @@ public class FragmentBookingRequest extends Fragment implements DatePickerDialog
                         @Override
                         public void onClick(View v) {
                             startClicked = false;
-                            showDateDialog();
+                            if(start_calendar != null) {
+                                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                                        FragmentBookingRequest.this,
+                                        start_calendar.get(Calendar.YEAR),
+                                        start_calendar.get(Calendar.MONTH),
+                                        start_calendar.get(Calendar.DAY_OF_MONTH)
+                                );
+                                dpd.setMinDate(start_calendar);
+                                dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+                            }else Toast.makeText(getContext(), "Please pick starting date first", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -228,20 +246,11 @@ public class FragmentBookingRequest extends Fragment implements DatePickerDialog
         builder.show();
     }
 
-    public void showDateDialog(){
-        DatePickerDialog dpd = DatePickerDialog.newInstance(
-                FragmentBookingRequest.this,
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
-        );
-        dpd.setMinDate(now);
-        dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
-    }
-
     @Override
     public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-        if(startClicked) start_date.setText((month+1)+"/"+day+"/"+year);
-        else end_date.setText((month+1)+"/"+day+"/"+year);
+        if(startClicked){
+            start_date.setText((month+1)+"/"+day+"/"+year);
+            start_calendar = new GregorianCalendar(year, month, day);
+        } else end_date.setText((month+1)+"/"+day+"/"+year);
     }
 }

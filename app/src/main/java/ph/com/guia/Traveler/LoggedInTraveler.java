@@ -189,8 +189,8 @@ public class LoggedInTraveler extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        try{fm.popBackStackImmediate();}
-        catch(Exception e){}
+        //try{fm.popBackStackImmediate();}
+        //catch(Exception e){}
 
         addedFrag = false;
         doubleBackToExitPressedOnce = false;

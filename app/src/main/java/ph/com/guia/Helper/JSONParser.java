@@ -50,6 +50,7 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.logging.Filter;
 
+import ph.com.guia.Guide.CreateTourFragment;
 import ph.com.guia.Guide.GuideAddInfoFragment;
 import ph.com.guia.Guide.GuideCalendarFragment;
 import ph.com.guia.Guide.GuideProfileFragment;
@@ -255,7 +256,8 @@ public class JSONParser {
 
                                         UpcomingFragment.mList.add(new Tours(req.getString("status"), tour_name, booking_id,
                                                 tour_description, date, user_name, tour_guideId, tour_rate,
-                                                main_image, tour_duration, null, points, "UpcomingTraveler", ""));
+                                                main_image, tour_duration, null, points, "UpcomingTraveler",
+                                                req.getJSONObject("guide").getString("name")));
                                     }
 
                                     if(i == response.length()-1){
@@ -321,7 +323,9 @@ public class JSONParser {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.e("Accept Booking", response.toString());
+                        CreateTourFragment.pd.dismiss();
+                        LoggedInGuide.fm.popBackStackImmediate();
+                        Toast.makeText(context, "New Tour Created!", Toast.LENGTH_SHORT).show();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -861,14 +865,14 @@ public class JSONParser {
                         }
                         else if(activity.equalsIgnoreCase("GuideProfile")){
                             try {
-                                if(LoggedInGuide.age == null){
-                                    LoggedInGuide.name = response.getJSONObject("user").getString("name");
-                                    LoggedInGuide.age = response.getJSONObject("user").getString("age");
-                                    LoggedInGuide.location = response.getString("city")+", "+response.getString("country");
-                                    LoggedInGuide.email = email;
-                                    LoggedInGuide.contact = contact;
-                                    LoggedInGuide.image = response.getJSONObject("user").getString("profImage");
-                                }
+                                LoggedInGuide.guide_id = guide_id;
+                                LoggedInGuide.name = response.getJSONObject("user").getString("name");
+                                LoggedInGuide.age = response.getJSONObject("user").getString("age");
+                                LoggedInGuide.location = response.getString("city")+", "+response.getString("country");
+                                LoggedInGuide.email = email;
+                                LoggedInGuide.contact = contact;
+                                LoggedInGuide.image = response.getJSONObject("user").getString("profImage");
+
 
                                 Bundle bundle = new Bundle();
                                 bundle.putDouble("rating", response.getDouble("rating"));
@@ -1104,6 +1108,12 @@ public class JSONParser {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            Toast.makeText(context, "Successfully created a review!", Toast.LENGTH_SHORT).show();
+                            MainActivity.points += request.getDouble("points");
+                            TripFragment tf = new TripFragment();
+                            LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
+                            LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, tf).commit();
+
                             JSONObject req = new JSONObject();
                             req.accumulate("trip_user_id", MainActivity.user_id);
                             req.accumulate("location", response.getJSONObject("tour").getString("tour_location"));
@@ -1436,6 +1446,8 @@ public class JSONParser {
                                 e.printStackTrace();
                             }
                         }
+
+                        if(response.length() == 0) TripListFragment.pd.dismiss();
                     }
                 }, new Response.ErrorListener() {
             @Override

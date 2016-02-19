@@ -43,8 +43,7 @@ public class TravelerProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.traveler_profile, container, false);
-
-        JSONParser.getInstance(getActivity().getApplicationContext()).getReviewsByGuideId(Constants.getReviewsByGuideId + LoggedInGuide.guide_id);
+        //JSONParser.getInstance(getActivity().getApplicationContext()).getReviewsByGuideId(Constants.getReviewsByGuideId + LoggedInGuide.guide_id);
 
         traveler_profile_cover = (LinearLayout) view.findViewById(R.id.traveler_profile_cover);
         profImage = (ImageView) view.findViewById(R.id.traveler_profile_image);

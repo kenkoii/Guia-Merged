@@ -2,6 +2,7 @@ package ph.com.guia.Guide;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -41,6 +42,7 @@ import ph.com.guia.Model.Constants;
 import ph.com.guia.R;
 
 public class CreateTourFragment extends Fragment implements View.OnClickListener {
+    public static ProgressDialog pd;
     ImageView main_image, add_image;
     EditText title, description, price, duration;
     Spinner duration_format;
@@ -104,6 +106,7 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
                 } else if (duration.getText().toString().trim().isEmpty()) {
                     duration.setError("Required");
                 } else {
+                    pd = ProgressDialog.show(getContext(), "Loading", "Please wait...", true, true);
                     if(new ConnectionChecker(getActivity().getApplicationContext()).isConnectedToInternet()){
                         Cloudinary cloudinary = new Cloudinary(Utils.cloudinaryUrlFromContext(getActivity().getApplicationContext()));
                         try{
@@ -202,13 +205,23 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
 
         switch(id){
             case R.id.itinerary_btnNext:
-                View view2 = inflater.inflate(R.layout.create_tour_dialog, null, false);
-                price = (EditText) view2.findViewById(R.id.itinerary_price);
-                negotiable = (Switch) view2.findViewById(R.id.itinerary_negotiable);
-                duration = (EditText) view2.findViewById(R.id.itinerary_duration);
-                duration_format = (Spinner) view2.findViewById(R.id.duration_format);
+                if(main_image == null) Toast.makeText(getContext(), "Please provide tour's main image!",
+                        Toast.LENGTH_SHORT).show();
+                else if(title.getText().toString().trim().isEmpty()){
+                    title.setError("Required!");
+                    title.requestFocus();
+                }else if(description.getText().toString().isEmpty()){
+                    description.setError("Required!");
+                    description.requestFocus();
+                }else {
+                    View view2 = inflater.inflate(R.layout.create_tour_dialog, null, false);
+                    price = (EditText) view2.findViewById(R.id.itinerary_price);
+                    negotiable = (Switch) view2.findViewById(R.id.itinerary_negotiable);
+                    duration = (EditText) view2.findViewById(R.id.itinerary_duration);
+                    duration_format = (Spinner) view2.findViewById(R.id.duration_format);
 
-                showAlertDialog(view2);
+                    showAlertDialog(view2);
+                }
                 break;
             case R.id.itinerary_image:
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);

@@ -80,7 +80,7 @@ public class TripListFragment extends Fragment {
 
                 LoggedInTraveler.addedFrag = true;
                 LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
-                LoggedInTraveler.ft.add(R.id.drawer_fragment_container, pf).addToBackStack(null).commit();
+                LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, pf).addToBackStack(null).commit();
             }
         });
         return view;
@@ -90,5 +90,6 @@ public class TripListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         LoggedInTraveler.mToolbar.setTitle("My Trips");
+        lv.setAdapter(adapter);
     }
 }
