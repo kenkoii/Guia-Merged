@@ -42,26 +42,29 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginLeft="25dp"
-                    android:layout_marginBottom="10dp">
+                    android:layout_marginBottom="13dp">
 
                     <RadioButton
                         android:id="@+id/rb_both"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="20dp"
                         android:layout_weight="1"
-                        android:text="Both"/>
+                        android:text="Both"
+                        android:textSize="13dp"/>
                     <RadioButton
                         android:id="@+id/rb_male"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="20dp"
                         android:layout_weight="1"
-                        android:text="Male"/>
+                        android:text="Male"
+                        android:textSize="13dp"/>
                     <RadioButton
                         android:id="@+id/rb_female"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="20dp"
                         android:layout_weight="1"
-                        android:text="Female"/>
+                        android:text="Female"
+                        android:textSize="13dp"/>
                 </RadioGroup>
 
                 <TextView
