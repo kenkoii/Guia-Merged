@@ -140,7 +140,7 @@ public class LoggedInGuide extends AppCompatActivity
                     drawer.closeDrawer(GravityCompat.START);
                 }else{
                     AlertDialog.Builder builder = new AlertDialog.Builder(LoggedInGuide.this);
-                    builder.setIcon(R.drawable.ic_launcher);
+                    builder.setIcon(R.drawable.guia_dialog);
                     builder.setTitle("Notice");
                     builder.setMessage("\nGuide Request Still Pending!\n");
                     builder.setPositiveButton("OK", null);
@@ -237,7 +237,7 @@ public class LoggedInGuide extends AppCompatActivity
                     ft.replace(R.id.drawer_fragment_container, tf).commit();
                 }else{
                     AlertDialog.Builder builder = new AlertDialog.Builder(LoggedInGuide.this);
-                    builder.setIcon(R.drawable.ic_launcher);
+                    builder.setIcon(R.drawable.guia_dialog);
                     builder.setTitle("Notice");
                     builder.setMessage("\nGuide Request Still Pending!\n");
                     builder.setPositiveButton("OK", null);

@@ -72,8 +72,8 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("gender", "BOTH");
-        cv.put("minPrice", 100);
-        cv.put("maxPrice", 1000);
+        cv.put("minPrice", 0);
+        cv.put("maxPrice", 5000);
         cv.put("interest", "13");
         db.insert(FILTER, null, cv);
         db.close();

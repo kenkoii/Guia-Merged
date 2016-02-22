@@ -1,6 +1,7 @@
 package ph.com.guia.Navigation;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -39,16 +40,23 @@ public class PendingFragment extends Fragment {
         pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);
 
         mList.clear();
-        if(!LoggedInGuide.guide_id.equals("")) {
-            JSONObject request = new JSONObject();
+        if(LoggedInGuide.mToolbar != null){
             try {
+                JSONObject request = new JSONObject();
                 request.accumulate("booking_guide_id", LoggedInGuide.guide_id);
+                JSONParser.getInstance(getContext()).getBookingsById(request, Constants.getBookingsByGuideId, "PendingFragment");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            JSONParser parser = new JSONParser(getActivity());
-            parser.getBookingsById(request, Constants.getBookingsByGuideId, "PendingFragment");
+        }else{
+            try {
+                JSONObject request = new JSONObject();
+                request.accumulate("booking_user_id", LoggedInTraveler.user_id);
+                Log.e("id", LoggedInTraveler.user_id);
+                JSONParser.getInstance(getContext()).getBookingsById(request, Constants.getBookingsByUserId, "PendingFragment");
+            } catch (JSONException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -64,5 +72,12 @@ public class PendingFragment extends Fragment {
         rv.setLayoutManager(llm);
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(mList.size() == 0) rv.setBackgroundResource(R.drawable.no_result);
     }
 }

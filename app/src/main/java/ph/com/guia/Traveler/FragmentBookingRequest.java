@@ -124,7 +124,7 @@ public class FragmentBookingRequest extends Fragment implements DatePickerDialog
                     });
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setIcon(R.drawable.ic_launcher);
+                    builder.setIcon(R.drawable.guia_dialog);
                     builder.setView(view2);
                     builder.setTitle("Book Schedule");
                     builder.setNegativeButton("Back", null);
@@ -226,7 +226,7 @@ public class FragmentBookingRequest extends Fragment implements DatePickerDialog
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setIcon(R.drawable.ic_launcher);
+        builder.setIcon(R.drawable.guia_dialog);
         builder.setTitle("Notice");
         builder.setMessage("\nTour price: " + tour.tour_rate + "\nService Charge: " + charge +
                 "\nEstimated Tour Expense: " + (tour.tour_rate + rate) +

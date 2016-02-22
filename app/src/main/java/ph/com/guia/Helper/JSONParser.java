@@ -56,10 +56,12 @@ import ph.com.guia.Guide.GuideCalendarFragment;
 import ph.com.guia.Guide.GuideProfileFragment;
 import ph.com.guia.Guide.LoggedInGuide;
 import ph.com.guia.Model.Note;
+import ph.com.guia.Model.Reward;
 import ph.com.guia.Model.Trip;
 import ph.com.guia.Navigation.FilterFragment;
 import ph.com.guia.Navigation.NoConnectionFragment;
 import ph.com.guia.Navigation.PreviousFragment;
+import ph.com.guia.Navigation.RedeemFragment;
 import ph.com.guia.Navigation.TripListFragment;
 import ph.com.guia.Traveler.TravelerProfileFragment;
 import ph.com.guia.MainActivity;
@@ -231,6 +233,9 @@ public class JSONParser {
                                     }
 
                                     if(i == response.length()-1) {
+                                        if(PendingFragment.mList.size() != 0)
+                                            PendingFragment.rv.setBackgroundColor(Color.TRANSPARENT);
+
                                         PendingFragment.adapter = new RVadapter(context, null, null, null, PendingFragment.mList);
                                         PendingFragment.rv.setAdapter(PendingFragment.adapter);
                                         PendingFragment.pd.dismiss();
@@ -245,6 +250,9 @@ public class JSONParser {
                                     }
 
                                     if(i == response.length()-1){
+                                        if(UpcomingFragment.mList.size() != 0)
+                                            UpcomingFragment.rv.setBackgroundColor(Color.TRANSPARENT);
+
                                         UpcomingFragment.adapter = new RVadapter(context, UpcomingFragment.mList, null, null, null);
                                         UpcomingFragment.rv.setAdapter(UpcomingFragment.adapter);
                                         UpcomingFragment.pd.dismiss();
@@ -261,6 +269,9 @@ public class JSONParser {
                                     }
 
                                     if(i == response.length()-1){
+                                        if(UpcomingFragment.mList.size() != 0)
+                                            UpcomingFragment.rv.setBackgroundColor(Color.TRANSPARENT);
+
                                         UpcomingFragment.adapter = new RVadapter(context, UpcomingFragment.mList, null, null, null);
                                         UpcomingFragment.rv.setAdapter(UpcomingFragment.adapter);
                                         UpcomingFragment.pd.dismiss();
@@ -277,6 +288,9 @@ public class JSONParser {
                                     }
 
                                     if(i == response.length()-1){
+                                        if(PreviousFragment.mList.size() != 0)
+                                            PreviousFragment.rv.setBackgroundColor(Color.TRANSPARENT);
+
                                         PreviousFragment.adapter = new RVadapter(context, PreviousFragment.mList, null, null, null);
                                         PreviousFragment.rv.setAdapter(PreviousFragment.adapter);
                                         PreviousFragment.pd.dismiss();
@@ -397,6 +411,8 @@ public class JSONParser {
                                             boolean ok = false;
                                             String gender = c.getString(c.getColumnIndex("gender"));
                                             String interest = c.getString(c.getColumnIndex("interest"));
+                                            int min = c.getInt(c.getColumnIndex("minPrice"));
+                                            int max = c.getInt(c.getColumnIndex("maxPrice"));
 
                                             StringTokenizer st = new StringTokenizer(tour_preference, "/");
                                             while(st.hasMoreTokens()){
@@ -406,8 +422,11 @@ public class JSONParser {
                                                 }
                                             }
 
-                                            if((ok || interest.equals("13")) && (gender.equalsIgnoreCase(tour_gender) || gender.equalsIgnoreCase("Both")) &&
-                                                (!obj.getJSONObject("user").getString("id").equals(LoggedInTraveler.user_id))){
+                                            if((ok || interest.equals("13")) &&
+                                                (gender.equalsIgnoreCase(tour_gender) || gender.equalsIgnoreCase("Both")) &&
+                                                (!obj.getJSONObject("user").getString("id").equals(LoggedInTraveler.user_id)) &&
+                                                (tour_rate >= min && tour_rate <= max)){
+
                                                 HomeFragment.mList.add(new Tours(tour_id, tour_name, tour_location,
                                                         tour_description, duration_format, tour_preference, tour_guideId,
                                                         tour_rate, main_image, tour_duration, null, points, "HomeFragment",
@@ -423,6 +442,10 @@ public class JSONParser {
                             if(i == response.length()-1) {
                                 MainActivity.pd.dismiss();
                                 HomeFragment.pd.dismiss();
+
+                                if(HomeFragment.mList.size() != 0)
+                                    HomeFragment.rv.setBackgroundColor(Color.TRANSPARENT);
+
                                 HomeFragment.adapter = new RVadapter(context, HomeFragment.mList, null, null, null);
                                 HomeFragment.rv.setAdapter(HomeFragment.adapter);
                             }
@@ -524,6 +547,9 @@ public class JSONParser {
                                 //Toast.makeText(context, response.toString(), Toast.LENGTH_LONG).show();
 
                                 if(i == response.length()-1) {
+                                    if(FragmentTripBooking.mList.size() != 0)
+                                        FragmentTripBooking.rv.setBackgroundColor(Color.TRANSPARENT);
+
                                     FragmentTripBooking.adapter = new RVadapter(context, FragmentTripBooking.mList, null, null, null);
                                     FragmentTripBooking.rv.setAdapter(FragmentTripBooking.adapter);
                                     FragmentTripBooking.pd.dismiss();
@@ -749,7 +775,7 @@ public class JSONParser {
                                             }
                                         }else{
                                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                            builder.setIcon(R.drawable.ic_launcher);
+                                            builder.setIcon(R.drawable.guia_dialog);
                                             builder.setTitle("Notice");
                                             builder.setMessage("\nYou have been deactivated as guide.\nProceed as Traveler?\n");
                                             builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -774,6 +800,8 @@ public class JSONParser {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
+                        MainActivity.pd.dismiss();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -1438,6 +1466,9 @@ public class JSONParser {
                                 TripListFragment.mList.add(new Trip(id, location, start_date, end_date, image, description));
 
                                 if(i == response.length()-1){
+                                    if(TripListFragment.mList.size() != 0)
+                                        TripListFragment.lv.setBackgroundColor(Color.TRANSPARENT);
+
                                     TripListFragment.adapter = new LVadapter(context, TripListFragment.mList);
                                     TripListFragment.lv.setAdapter(TripListFragment.adapter);
                                     TripListFragment.pd.dismiss();
@@ -1481,6 +1512,7 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("POSTTRIP", error.getMessage());
+                postTrip(request, url);
             }
         });
         mRequestQueue.add(jsonObjectRequest);
@@ -1499,6 +1531,72 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("POSTTRIP", error.getMessage());
+                updateTrip(request, url);
+            }
+        });
+        mRequestQueue.add(jsonObjectRequest);
+    }
+
+    public void getRewards(final String url){
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, "",
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        for(int i = 0; i < response.length(); i++){
+                            try {
+                                JSONObject req = response.getJSONObject(i);
+                                if(req.getBoolean("isActivated")){
+                                    String id = req.getString("_id");
+                                    String tour_name = req.getString("tour_name");
+                                    String tour_location = req.getString("tour_location");
+                                    String tour_detail = req.getString("tour_details");
+                                    String points = req.getString("redeem_points");
+                                    String image = req.getString("main_image");
+
+                                    RedeemFragment.mList.add(new Reward(id, tour_name, tour_location,
+                                            tour_detail, points, image));
+                                }
+
+                                if(i == response.length()-1){
+                                    if(RedeemFragment.mList.size() != 0)
+                                        RedeemFragment.lv.setBackgroundColor(Color.TRANSPARENT);
+
+                                    RedeemFragment.adapter = new LVadapter(context, null, RedeemFragment.mList);
+                                    RedeemFragment.lv.setAdapter(RedeemFragment.adapter);
+                                    RedeemFragment.pd.dismiss();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("GETNOTE", error.getMessage());
+                getRewards(url);
+            }
+        });
+        mRequestQueue.add(jsonArrayRequest);
+    }
+
+    public void redeemReward(final JSONObject request, final String url){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, request,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Log.e("asdas", "Successfully Redeemed Reward!");
+                            MainActivity.points -= Double.parseDouble(request.getString("points"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("POSTTRIP", error.getMessage());
+                redeemReward(request, url);
             }
         });
         mRequestQueue.add(jsonObjectRequest);

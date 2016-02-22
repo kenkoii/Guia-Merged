@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        pd.dismiss();
+                        //pd.dismiss();
                         //MainActivity.this.finish();
                     }
                 });

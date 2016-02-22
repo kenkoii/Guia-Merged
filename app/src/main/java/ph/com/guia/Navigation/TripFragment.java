@@ -42,12 +42,8 @@ public class TripFragment extends Fragment {
 
         tabLayout = (TabLayout) inflatedView.findViewById(R.id.tabLayout);
 
-        try {
-            LoggedInGuide.mToolbar.setTitle("Tours");
-            tabLayout.addTab(tabLayout.newTab().setText("Pending"));
-        }
-        catch(Exception e){ LoggedInTraveler.mToolbar.setTitle("Tours");}
 
+        tabLayout.addTab(tabLayout.newTab().setText("Pending"));
         tabLayout.addTab(tabLayout.newTab().setText("Upcoming"));
         //tabLayout.addTab(tabLayout.newTab().setText("Previous"));
 
@@ -92,35 +88,15 @@ public class TripFragment extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-
-            try {
-                LoggedInGuide.mToolbar.setTitle("Tours");
-
-                switch (position) {
-                    case 0:
-                        PendingFragment pf = new PendingFragment();
-                        return pf;
-                    case 1:
-                        UpcomingFragment uf = new UpcomingFragment();
-                        return uf;
-                    case 2:
-                        PreviousFragment pvf = new PreviousFragment();
-                        return pvf;
-                    default:
-                        return null;
-                }
-            }
-            catch(Exception e){
-                switch (position) {
-                    case 0:
-                        UpcomingFragment uf = new UpcomingFragment();
-                        return uf;
-                    case 1:
-                        PreviousFragment pvf = new PreviousFragment();
-                        return pvf;
-                    default:
-                        return null;
-                }
+            switch (position) {
+                case 0:
+                    PendingFragment pf = new PendingFragment();
+                    return pf;
+                case 1:
+                    UpcomingFragment uf = new UpcomingFragment();
+                    return uf;
+                default:
+                    return null;
             }
         }
 

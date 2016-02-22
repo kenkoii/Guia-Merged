@@ -88,6 +88,9 @@ public class FragmentTripBooking extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        if(mList.size() == 0) rv.setBackgroundResource(R.drawable.no_result);
+
         llm.scrollToPosition(0);
         adapter = new RVadapter(getActivity().getApplicationContext(), mList, null, null, null);
         rv.setAdapter(adapter);

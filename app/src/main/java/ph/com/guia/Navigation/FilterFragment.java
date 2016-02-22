@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.yahoo.mobile.client.android.util.rangeseekbar.RangeSeekBar;
+import org.florescu.android.rangeseekbar.RangeSeekBar;
 
 import java.util.ArrayList;
 
@@ -30,10 +30,11 @@ public class FilterFragment extends Fragment{
     public static LinearLayout linearLayout;
     public static ArrayList<CheckBox> cbs = new ArrayList<CheckBox>();
     public static ProgressDialog pd;
-    RangeSeekBar rsb;
+    public static RangeSeekBar rsb;
     RadioGroup rg;
     RadioButton rb_both, rb_male, rb_female;
     DBHelper db;
+    int min=0, max=5000;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public class FilterFragment extends Fragment{
         rb_female = (RadioButton) view.findViewById(R.id.rb_female);
         linearLayout = (LinearLayout) view.findViewById(R.id.filter_cbs);
         rsb = (RangeSeekBar) view.findViewById(R.id.range_seekbar);
+        rsb.setTextAboveThumbsColorResource(R.color.colorPrimaryDark);
 
         rsb.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
             @Override
@@ -77,6 +79,11 @@ public class FilterFragment extends Fragment{
         Cursor c = db.getFilter();
         if (c.moveToFirst()) {
             String gender = c.getString(c.getColumnIndex("gender"));
+            min = c.getInt(c.getColumnIndex("minPrice"));
+            max = c.getInt(c.getColumnIndex("maxPrice"));
+
+            rsb.setSelectedMaxValue((Number) max);
+            rsb.setSelectedMinValue((Number) min);
 
             if (gender.equals("BOTH")) rb_both.setChecked(true);
             else if (gender.equals("MALE")) rb_male.setChecked(true);

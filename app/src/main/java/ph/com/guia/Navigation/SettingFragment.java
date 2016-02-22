@@ -98,7 +98,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
 
     public void showDialog(final String type){
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setIcon(R.drawable.ic_launcher);
+        builder.setIcon(R.drawable.guia_dialog);
         builder.setTitle("Login As");
         builder.setMessage("Are you sure you want to login as: " + type);
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {

@@ -1,6 +1,7 @@
 package ph.com.guia.Navigation;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -74,6 +75,8 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         llm.scrollToPosition(0);
+
+        if(mList.size() == 0) rv.setBackgroundResource(R.drawable.no_result);
 
         if(mList.size() > 0)
             pd = ProgressDialog.show(this.getContext(), "Loading", "Please wait...", true, true);

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import ph.com.guia.Guide.GuideCalendarFragment;
 import ph.com.guia.Helper.ConnectionChecker;
+import ph.com.guia.Helper.DBHelper;
 import ph.com.guia.Helper.JSONParser;
 import ph.com.guia.MainActivity;
 import ph.com.guia.Model.Constants;
@@ -35,6 +36,7 @@ import ph.com.guia.Navigation.HomeFragment;
 import ph.com.guia.Navigation.MessageFragment;
 import ph.com.guia.Navigation.NoConnectionFragment;
 import ph.com.guia.Navigation.PreviousFragment;
+import ph.com.guia.Navigation.RedeemFragment;
 import ph.com.guia.Navigation.SettingFragment;
 import ph.com.guia.Navigation.TripFragment;
 import ph.com.guia.Navigation.TripListFragment;
@@ -62,6 +64,7 @@ public class LoggedInTraveler extends AppCompatActivity
     GuideCalendarFragment gcf = new GuideCalendarFragment();
     FragmentNewTrip fnt = new FragmentNewTrip();
     TripListFragment tlf = new TripListFragment();
+    RedeemFragment rf = new RedeemFragment();
     public static FragmentManager fm;
     public static LayoutInflater inflater;
 
@@ -179,6 +182,14 @@ public class LoggedInTraveler extends AppCompatActivity
             case R.id.done:
                 addedFrag = false;
                 ft = getSupportFragmentManager().beginTransaction();
+                try{
+                    int min = Integer.parseInt(FilterFragment.rsb.getSelectedMinValue().toString());
+                    int max = Integer.parseInt(FilterFragment.rsb.getSelectedMaxValue().toString());
+
+                    DBHelper db = new DBHelper(this);
+                    db.updFilterPrice(min, max);
+                }catch(Exception e){}
+
                 HomeFragment home = new HomeFragment();
                 ft.replace(R.id.drawer_fragment_container, home).commit();
         }
@@ -222,6 +233,10 @@ public class LoggedInTraveler extends AppCompatActivity
             case R.id.nav_trips:
                 ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.drawer_fragment_container, tlf).commit();
+                break;
+            case R.id.nav_redeem:
+                ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.drawer_fragment_container, rf).commit();
                 break;
             case R.id.nav_messages:
                 ft = getSupportFragmentManager().beginTransaction();

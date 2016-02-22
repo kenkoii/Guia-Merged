@@ -225,7 +225,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
 //                            drawable.setColorFilter(Color.parseColor("#FFFDEC00"), PorterDuff.Mode.SRC_ATOP);
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setIcon(R.drawable.ic_launcher);
+                            builder.setIcon(R.drawable.guia_dialog);
                             builder.setView(view);
                             builder.setTitle("Rate and Review");
                             builder.setNegativeButton("Back", null);
@@ -319,42 +319,46 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
 
             holder.pending_image.setImageUrl(pr.get(position).image, imageLoader);
             holder.user_name.setText(pr.get(position).user_name);
-            holder.user_gender_age.setText(pr.get(position).user_gender+" "+pr.get(position).user_age);
+            holder.user_gender_age.setText(pr.get(position).user_gender + " " + pr.get(position).user_age);
             holder.date_booked.setText(pr.get(position).date_booked);
             holder.tour_booked.setText(pr.get(position).tour_booked);
 
-//            final JSONParser parser = new JSONParser(context);
-//            parser.getImageUrl(pr.get(position).image, "AcceptBooking", position);
+            if(LoggedInGuide.mToolbar != null) {
+                holder.ivAccept.setVisibility(View.VISIBLE);
+                holder.ivDecline.setVisibility(View.VISIBLE);
 
-            holder.ivAccept.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    JSONObject request = new JSONObject();
-                    try {
-                        Log.e("reqid", index+" "+pr.get(index).booking_id);
-                        request.accumulate("_id", pr.get(index).booking_id);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                holder.ivAccept.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        JSONObject request = new JSONObject();
+                        try {
+                            Log.e("reqid", index + " " + pr.get(index).booking_id);
+                            request.accumulate("_id", pr.get(index).booking_id);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        JSONParser.getInstance(context).acceptBooking(request, Constants.acceptBooking);
                     }
+                });
 
-                    JSONParser.getInstance(context).acceptBooking(request, Constants.acceptBooking);
-                }
-            });
+                holder.ivDecline.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        JSONObject request = new JSONObject();
+                        try {
+                            request.accumulate("_id", pr.get(index).booking_id);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
-            holder.ivDecline.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    JSONObject request = new JSONObject();
-                    try {
-                        request.accumulate("_id", pr.get(index).booking_id);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        JSONParser.getInstance(context).acceptBooking(request, Constants.declineBooking);
                     }
-
-                    JSONParser.getInstance(context).acceptBooking(request, Constants.declineBooking);
-                }
-            });
-
+                });
+            }else{
+                holder.ivAccept.setVisibility(View.GONE);
+                holder.ivDecline.setVisibility(View.GONE);
+            }
             PendingFragment.pd.dismiss();
         }
         else if(rw != null){

@@ -89,7 +89,7 @@ public class CreateTourFragment extends Fragment implements View.OnClickListener
 
     public void showAlertDialog(final View view2){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setIcon(R.drawable.ic_launcher);
+        builder.setIcon(R.drawable.guia_dialog);
         builder.setView(view2);
         builder.setTitle("Pricing");
         builder.setNegativeButton("Back", null);

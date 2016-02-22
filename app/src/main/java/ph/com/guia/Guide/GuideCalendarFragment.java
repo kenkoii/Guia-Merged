@@ -105,7 +105,7 @@ public class GuideCalendarFragment extends Fragment {
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setIcon(R.drawable.ic_launcher);
+        builder.setIcon(R.drawable.guia_dialog);
         builder.setView(view2);
         builder.setTitle(dialogTitle);
         builder.setNegativeButton("Back", null);
@@ -211,7 +211,7 @@ public class GuideCalendarFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        builder.setIcon(R.drawable.ic_launcher);
+                        builder.setIcon(R.drawable.guia_dialog);
                         builder.setTitle("Warning!");
                         builder.setMessage("\nAre you sure you want to delete note?\n");
                         builder.setNegativeButton("No", null);

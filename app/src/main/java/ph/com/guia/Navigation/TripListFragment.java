@@ -2,6 +2,7 @@ package ph.com.guia.Navigation;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -89,6 +90,9 @@ public class TripListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        if(mList.size() == 0) lv.setBackgroundResource(R.drawable.no_result);
+
         LoggedInTraveler.mToolbar.setTitle("My Trips");
         lv.setAdapter(adapter);
     }

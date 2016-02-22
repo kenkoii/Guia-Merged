@@ -79,4 +79,12 @@ public class UpcomingFragment extends Fragment {
 
         return view;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(mList.size() == 0) rv.setBackgroundResource(R.drawable.no_result);
+        rv.setAdapter(adapter);
+    }
 }

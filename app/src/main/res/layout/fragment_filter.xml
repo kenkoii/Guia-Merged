@@ -77,15 +77,16 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginLeft="5dp"/>
 
-                <com.yahoo.mobile.client.android.util.rangeseekbar.RangeSeekBar
+                <org.florescu.android.rangeseekbar.RangeSeekBar
                     xmlns:rsb="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/range_seekbar"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="-15dp"
                     android:layout_marginLeft="25dp"
-                    rsb:absoluteMinValue="100"
-                    rsb:absoluteMaxValue="1000"/>
+                    rsb:absoluteMinValue="0"
+                    rsb:absoluteMaxValue="5000"
+                    android:theme="@style/AlertDialog.AppCompat.Light"/>
 
             </LinearLayout>
         </android.support.v7.widget.CardView>

@@ -1,6 +1,7 @@
 package ph.com.guia.Navigation;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -60,5 +61,14 @@ public class PreviousFragment extends Fragment {
         rv.setLayoutManager(llm);
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(mList.size() == 0) rv.setBackgroundResource(R.drawable.no_result);
+        else rv.setBackgroundColor(Color.TRANSPARENT);
+
     }
 }
