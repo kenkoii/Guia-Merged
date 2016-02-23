@@ -59,6 +59,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
     static Context context;
     private ImageLoader imageLoader;
     static boolean[] ok;
+    public static CardViewHolder cvh;
 
     public RVadapter(Context context, List<Tours> tours, List<MessageItem> mi, List<User> user, List<PendingRequest> pr) {
         this.tours = tours;
@@ -111,7 +112,7 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
             view = inflater.inflate(R.layout.review_layout, parent, false);
         }
 
-        CardViewHolder cvh = new CardViewHolder(view);
+        cvh = new CardViewHolder(view);
         return cvh;
     }
 
@@ -277,7 +278,11 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
             //TODO: Kentoy
             holder.message_name.setText(mi.get(position).name);
             holder.message_details.setText(mi.get(position).message_part);
-            holder.message_image.setImageResource(mi.get(position).image);
+            String url = mi.get(position).image;
+            JSONParser parser = new JSONParser(context);
+            parser.getImageUrl(url, "MessagesCircle", position);
+//            holder.message_image.setImageURI(Uri.parse(mi.get(position).image));
+
 
             holder.message_view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -285,11 +290,17 @@ public class RVadapter extends RecyclerView.Adapter<RVadapter.CardViewHolder> {
                     MessageDetailFragment mdf = new MessageDetailFragment();
                     try{
                         LoggedInGuide.mToolbar.setTitle(mi.get(index).name);
+                        mdf.conversation = mi.get(index).conversation;
+//                        mdf.mUsername = mi.get(index).name;
+                        mdf.mUsername = LoggedInGuide.name;
                         LoggedInGuide.addedFrag = true;
                         LoggedInGuide.ft = LoggedInGuide.fm.beginTransaction();
                         LoggedInGuide.ft.replace(R.id.drawer_fragment_container, mdf).addToBackStack(null).commit();
                     }catch(Exception e){
                         LoggedInTraveler.mToolbar.setTitle(mi.get(index).name);
+                        mdf.conversation = mi.get(index).conversation;
+//                        mdf.mUsername = mi.get(index).name;
+                        mdf.mUsername = LoggedInTraveler.name;
                         LoggedInTraveler.addedFrag = true;
                         LoggedInTraveler.ft = LoggedInTraveler.fm.beginTransaction();
                         LoggedInTraveler.ft.replace(R.id.drawer_fragment_container, mdf).addToBackStack(null).commit();

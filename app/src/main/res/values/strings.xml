@@ -8,6 +8,11 @@
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
     <string name="action_settings">Settings</string>
+    <!-- Messaging -->
+    <string name="btn_send">Send</string>
+    <string name="message_user_joined">%s joined</string>
+    <string name="message_user_left">%s left</string>
+    <string name="user_action_typing">is typing</string>
 
     <string name="rate_review">
         This tour was marked as done, please rate the tour in order to claim your reward.

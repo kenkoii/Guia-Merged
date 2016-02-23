@@ -22,6 +22,10 @@ android {
     }
 }
 
+repositories {
+    maven { url 'http://clojars.org/repo' }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
@@ -38,4 +42,8 @@ dependencies {
     compile 'com.wdullaer:materialdatetimepicker:2.1.1'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
     compile 'com.paypal.sdk:paypal-android-sdk:2.13.1'
+    compile 'com.pusher:pusher-java-client:1.0.0'
+    compile 'com.loopj.android:android-async-http:1.4.9' // for our HTTP requests later
+    compile 'com.google.code.gson:gson:2.2.4' // for parsing JSON
+    compile 'com.squareup.picasso:picasso:2.1.1' // for image rendering
 }

@@ -37,7 +37,8 @@ public class Constants {
     public static String getNotesByGuideId = "http://guia.herokuapp.com/api/v1/note/";
     public static String updateNote = "http://guia.herokuapp.com/api/v1/notes/";
     public static String deleteNote = "http://guia.herokuapp.com/api/v1/note/";
-
+    public static String postMessage = "http://guia.herokuapp.com/api/v1/conversation/";
+    public static String getConversations = "http://guia.herokuapp.com/api/v1/conversations/";
     public static String getRewards = "http://guia.herokuapp.com/api/v1/rewards";
     public static String redeemReward = "http://guia.herokuapp.com/api/v1/redeem";
 

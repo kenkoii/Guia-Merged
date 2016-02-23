@@ -1038,7 +1038,9 @@ public class JSONParser {
                             BitmapDrawable background = new BitmapDrawable(bitmap);
                             TravelerProfileFragment.traveler_profile_cover.setBackgroundDrawable(background);
                         }
-
+                        else if(activity.equalsIgnoreCase("MessagesCircle")) {
+                            RVadapter.cvh.message_image.setImageBitmap(bitmap);
+                        }
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
